@@ -39,7 +39,8 @@ export function useSite() {
   return c;
 }
 
-export function Reveal({ children, delay = 0, as: Tag = "div", className = "" }: { children: ReactNode; delay?: number; as?: ElementType; className?: string }) {
+// `focus` fades, scales and sharpens the child in (images); the default fades and lifts it (text and blocks).
+export function Reveal({ children, delay = 0, as: Tag = "div", focus = false, className = "" }: { children: ReactNode; delay?: number; as?: ElementType; focus?: boolean; className?: string }) {
   const ref = useRef<HTMLElement>(null);
   const [v, setV] = useState(false);
   useEffect(() => {
@@ -49,5 +50,5 @@ export function Reveal({ children, delay = 0, as: Tag = "div", className = "" }:
     io.observe(el);
     return () => io.disconnect();
   }, []);
-  return <Tag ref={ref} data-visible={v} className={`reveal ${className}`} style={{ ["--d" as string]: `${delay}ms` }}>{children}</Tag>;
+  return <Tag ref={ref} data-visible={v} className={`${focus ? "reveal-focus" : "reveal"} ${className}`} style={{ ["--d" as string]: `${delay}ms` }}>{children}</Tag>;
 }

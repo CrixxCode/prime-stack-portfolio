@@ -35,7 +35,7 @@ export function About() {
             <Reveal delay={40}><p>{a.p1}</p></Reveal><Reveal delay={80}><p>{a.p2}</p></Reveal><Reveal delay={120}><p className="text-foreground">{a.p3}</p></Reveal>
           </div>
         </div>
-        <Reveal delay={60} className="lg:col-span-4 lg:col-start-9">
+        <Reveal focus delay={60} className="lg:col-span-4 lg:col-start-9">
           <img src="/foto-personal.jpeg" alt={a.photoAlt} width={785} height={1177} loading="lazy" decoding="async"
             className="block aspect-[4/5] w-full rounded-xl border border-border-strong bg-surface object-cover object-[50%_20%]" />
         </Reveal>
@@ -66,9 +66,9 @@ export function Projects() {
         <div className="space-y-28 md:space-y-40">
           {p.items.map((it, i) => { const Mock = i % 2 ? ExamMock : HotelMock; return (
             <article key={it.name} className="grid min-h-[80vh] items-center gap-10 lg:grid-cols-12 lg:gap-14">
-              <Reveal className={`lg:col-span-7 ${i % 2 ? "lg:order-2" : ""}`}>
+              <Reveal focus className={`lg:col-span-7 ${i % 2 ? "lg:order-2" : ""}`}>
                 <div className="relative rounded-2xl border border-border bg-surface-2 p-4 md:p-8">
-                  <div className="absolute left-4 top-4 font-mono text-[10px] text-muted-foreground md:left-8">fig.0{i + 1}</div>
+                  <div className="absolute left-4 top-4 font-mono text-[10px] text-muted-foreground md:left-8" aria-hidden="true">fig.0{i + 1}</div>
                   <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]"><Mock label={`${p.mock}: ${it.name}`} /></div>
                 </div>
               </Reveal>
@@ -159,7 +159,7 @@ export function Experience() {
         <Reveal as="article" className="grid gap-8 md:grid-cols-12">
           <div className="md:col-span-4">
             <div className="font-mono text-xs text-muted-foreground"><time dateTime={e.start}>{start}</time> – {e.present}</div>
-            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary anim-pulse" />{e.current}</span>
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{e.current}</span>
           </div>
           <div className="md:col-span-8">
             <h3 className="text-[clamp(2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em]">{e.company}</h3>
@@ -213,7 +213,7 @@ export function Education() {
 export function GitHubPanel() {
   const { t } = useSite(); const g = t.github;
   const cells = Array.from({ length: 7 * 40 }, (_, i) => ((i * 37) % 11) / 10);
-  const Ph = () => <span className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">placeholder</span>;
+  const Ph = () => <span className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{g.ph}</span>;
   return (
     <section id="github" className="flex min-h-dvh items-center bg-surface/40 py-24 md:py-36">
       <div className="container-x">
@@ -227,7 +227,7 @@ export function GitHubPanel() {
             <div className="space-y-5 border-b border-border p-6 lg:col-span-4 lg:border-b-0 lg:border-r">
               <div className="flex items-center justify-between"><h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.profile}</h3><Ph /></div>
               <div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-full border border-border-strong bg-surface-2 font-mono text-xs">{CONTACT.initials}</div><div><div className="font-medium">{CONTACT.name}</div><a href={CONTACT.github} className="font-mono text-xs text-muted-foreground hover:text-foreground">@{CONTACT.githubUser}</a></div></div>
-              <dl className="grid grid-cols-3 gap-2 text-center">{["Repos", "Stars", "Followers"].map((k) => <div key={k} className="flex flex-col-reverse rounded-lg border border-border p-2"><dt className="text-xs text-muted-foreground">{k}</dt><dd className="font-mono text-lg">—</dd></div>)}</dl>
+              <dl className="grid grid-cols-3 gap-2 text-center">{g.stats.map((k) => <div key={k} className="flex flex-col-reverse rounded-lg border border-border p-2"><dt className="text-xs text-muted-foreground">{k}</dt><dd className="font-mono text-lg">—</dd></div>)}</dl>
               <div>
                 <div className="mb-2 flex items-center justify-between"><h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.langs}</h3><Ph /></div>
                 <div className="flex h-2 overflow-hidden rounded-full bg-surface-2"><div className="w-2/5 bg-primary/70" /><div className="w-1/4 bg-brand-2/60" /><div className="w-1/6 bg-border-strong" /></div>
@@ -271,7 +271,7 @@ export function Services() {
         {s.items.map((x, i) => { const I = icons[i]; return (
           <Reveal as="li" key={x.t} delay={i * 30} className="group grid grid-cols-[auto_1fr] items-center gap-5 py-6 md:grid-cols-[60px_1fr_1fr] md:py-8">
             <I className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" aria-hidden="true" />
-            <h3 className="text-xl font-semibold tracking-tight transition-transform duration-300 group-hover:translate-x-1 md:text-3xl">{x.t}</h3>
+            <h3 className="text-xl font-semibold tracking-tight md:text-3xl">{x.t}</h3>
             <p className="col-span-2 text-muted-foreground md:col-span-1">{x.d}</p>
           </Reveal>); })}
       </ul>
@@ -312,7 +312,7 @@ export function Contact() {
     setOk(true);
     window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Portfolio — " + name)}&body=${encodeURIComponent(msg + "\n\n" + email)}`;
   };
-  const field = "mt-2 block w-full rounded-lg border border-input bg-background px-4 py-3 text-[15px] transition-colors placeholder:text-muted-foreground focus:border-primary focus:outline-none focus-visible:outline-2 focus-visible:outline-ring aria-[invalid=true]:border-destructive";
+  const field = "mt-2 block w-full rounded-lg border border-input bg-background px-4 py-3 text-[15px] transition-colors placeholder:text-muted-foreground focus:border-primary aria-[invalid=true]:border-destructive";
   const socials = [{ I: Mail, l: "Email", h: `mailto:${CONTACT.email}` }, { I: Linkedin, l: "LinkedIn", h: CONTACT.linkedin }, { I: Github, l: "GitHub", h: CONTACT.github }];
   return (
     <section id="contact" className="relative flex min-h-dvh items-center overflow-hidden border-t border-border py-24">
@@ -324,9 +324,9 @@ export function Contact() {
             <Reveal><h2 className="text-[clamp(2.6rem,7vw,6rem)] font-semibold leading-[0.95] tracking-[-0.045em] text-balance">{c.title}</h2></Reveal>
             <Reveal delay={50}><p className="mt-6 max-w-md text-lg text-muted-foreground">{c.text}</p></Reveal>
             <Reveal delay={80}>
-              <a href={`mailto:${CONTACT.email}`} className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03]">{t.hero.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></a>
+              <a href={`mailto:${CONTACT.email}`} className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">{t.hero.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></a>
               <ul className="mt-10 flex flex-wrap gap-2">
-                {socials.map(({ I, l, h }) => <li key={l}><a href={h} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-colors hover:bg-surface-2"><I className="h-4 w-4" aria-hidden="true" />{l}</a></li>)}
+                {socials.map(({ I, l, h }) => <li key={l}><a href={h} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]"><I className="h-4 w-4" aria-hidden="true" />{l}</a></li>)}
               </ul>
             </Reveal>
           </div>
@@ -341,7 +341,7 @@ export function Contact() {
                   {errs[k] && <p id={`e-${k}`} className="mt-1.5 text-sm text-destructive">{errs[k]}</p>}
                 </div>
               ))}
-              <button type="submit" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-foreground text-sm font-medium text-background transition-transform hover:scale-[1.01] active:scale-[0.99]">{c.send}<ArrowRight className="h-4 w-4" /></button>
+              <button type="submit" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-foreground text-sm font-medium text-background transition-transform active:scale-[0.97]">{c.send}<ArrowRight className="h-4 w-4" /></button>
               <p role="status" aria-live="polite" className="text-sm text-success">{ok && <>{c.ok} {c.okFallback} <a href={`mailto:${CONTACT.email}`} className="underline underline-offset-2">{CONTACT.email}</a>.</>}</p>
             </form>
           </Reveal>
@@ -361,7 +361,7 @@ export function Footer() {
           <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={CONTACT.github}>GitHub</a></li>
           <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={CONTACT.linkedin}>LinkedIn</a></li>
           <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={`mailto:${CONTACT.email}`}>Email</a></li>
-          <li><button type="button" onClick={() => setLang(lang === "es" ? "en" : "es")} aria-label={t.nav.switchLang} className="inline-flex min-h-11 items-center px-3 font-mono text-xs hover:text-foreground"><span className={lang === "es" ? "text-foreground" : ""}>ES</span>&nbsp;/&nbsp;<span className={lang === "en" ? "text-foreground" : ""}>EN</span></button></li>
+          <li><button type="button" onClick={() => setLang(lang === "es" ? "en" : "es")} aria-label={`ES / EN — ${t.nav.switchLang}`} className="inline-flex min-h-11 items-center px-3 font-mono text-xs hover:text-foreground"><span className={lang === "es" ? "text-foreground" : ""}>ES</span>&nbsp;/&nbsp;<span className={lang === "en" ? "text-foreground" : ""}>EN</span></button></li>
         </ul>
       </div>
     </footer>

@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { ArrowDownRight, ArrowRight } from "lucide-react";
 import { useSite } from "@/lib/site";
+import { CONTACT } from "@/lib/i18n";
 
 function Avatar() {
   const ref = useRef<HTMLDivElement>(null);
@@ -10,10 +11,15 @@ function Avatar() {
     ref.current.style.setProperty("--mx", String((e.clientX - r.left) / r.width - 0.5));
     ref.current.style.setProperty("--my", String((e.clientY - r.top) / r.height - 0.5));
   };
+  // Ease the layers back to center (via their existing transition) instead of leaving them where the pointer exited.
+  const onLeave = () => {
+    ref.current?.style.setProperty("--mx", "0");
+    ref.current?.style.setProperty("--my", "0");
+  };
   const layer = (k: number) => ({ transform: `translate3d(calc(var(--mx,0) * ${k}px), calc(var(--my,0) * ${k}px), 0)`, transition: "transform 500ms cubic-bezier(.2,.7,.2,1)" });
   const nodes = [[90, 70], [250, 60], [330, 170], [170, 200], [70, 300], [280, 320], [200, 400]];
   return (
-    <div ref={ref} onPointerMove={onMove} className="relative aspect-[4/5] w-full max-w-md" aria-hidden="true">
+    <div ref={ref} onPointerMove={onMove} onPointerLeave={onLeave} className="relative aspect-[4/5] w-full max-w-md" aria-hidden="true">
       <div className="absolute inset-0 rounded-2xl border border-border bg-surface bg-grid [mask-image:radial-gradient(closest-side,black,transparent)]" />
       <svg viewBox="0 0 400 500" className="absolute inset-0 h-full w-full" style={layer(10)}>
         {/* head silhouette made of geometry */}
@@ -31,7 +37,7 @@ function Avatar() {
             <text x={x + 9} y={y - 7} fontSize="8" fontFamily="var(--font-mono)" fill="var(--muted-foreground)">{`n${i}·${x},${y}`}</text>
           </g>
         ))}
-        <circle cx="170" cy="200" r="3" fill="var(--primary)" className="anim-pulse" />
+        <circle cx="170" cy="200" r="3" fill="var(--primary)" />
       </svg>
       <div className="absolute left-[-6%] top-[14%] anim-float" style={layer(24)}>
         <div className="rounded-lg border border-border-strong bg-card px-3 py-2 font-mono text-[10px] leading-relaxed shadow-soft">
@@ -59,25 +65,29 @@ export function Hero() {
     <section id="home" className="relative flex min-h-dvh items-center overflow-hidden pt-28 pb-16">
       <div className="pointer-events-none absolute inset-0 bg-glow" />
       <div className="container-x relative grid items-center gap-14 lg:grid-cols-[1.25fr_1fr]">
-        <div>
-          <div className="reveal flex items-center gap-3 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground" data-visible="true">
-            <span className="h-px w-8 bg-foreground" />{h.label}
+        <div className="hero-stagger">
+          <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="h-px w-8 shrink-0 bg-foreground" />
+            <span className="flex flex-col gap-1 sm:flex-row sm:gap-2">
+              <span>{CONTACT.name}</span>
+              <span><span className="hidden sm:inline" aria-hidden="true">· </span>{h.label}</span>
+            </span>
           </div>
-          <h1 key={h.title} className="mt-6 text-[clamp(2.6rem,6.4vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-balance animate-in fade-in slide-in-from-bottom-3 duration-700">
+          <h1 className="mt-6 text-[clamp(2.6rem,6.4vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-balance">
             {h.title}
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">{h.sub}</p>
           <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted-foreground">{h.stackNote}</p>
           <ul translate="no" className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-foreground" aria-label="Stack">
-            {["Django", "Angular", ".NET", "React", "PostgreSQL"].map((s, i) => (
-              <li key={s} className="flex items-center gap-3">{i > 0 && <span className="text-muted-foreground" aria-hidden="true">·</span>}{s}</li>
+            {["Django", "Angular", ".NET", "React", "PostgreSQL"].map((s, i, all) => (
+              <li key={s} className="flex items-center gap-3">{s}{i < all.length - 1 && <span className="text-muted-foreground" aria-hidden="true">·</span>}</li>
             ))}
           </ul>
           <div className="mt-9 flex flex-wrap items-center gap-3">
-            <a href="#contact" className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.98]">
+            <a href="#contact" className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">
               {h.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </a>
-            <a href="#projects" className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-border-strong px-6 text-sm font-medium transition-colors hover:bg-surface-2">
+            <a href="#projects" className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-border-strong px-6 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
               {h.cta2}<ArrowDownRight className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
             </a>
           </div>
@@ -85,7 +95,7 @@ export function Hero() {
             <span className="h-2 w-2 rounded-full bg-success anim-pulse" aria-hidden="true" />{h.status}
           </p>
         </div>
-        <div className="flex justify-center lg:justify-end"><Avatar /></div>
+        <div className="hero-art-in flex justify-center lg:justify-end"><Avatar /></div>
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground md:block">scroll ↓</div>
     </section>

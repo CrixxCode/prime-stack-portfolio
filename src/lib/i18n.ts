@@ -3,7 +3,7 @@ export type Lang = "es" | "en";
 const es = {
   nav: { home: "Inicio", about: "Sobre mí", experience: "Experiencia", projects: "Proyectos", stack: "Stack", education: "Formación", github: "GitHub", contact: "Contacto", cta: "Hablemos", menu: "Menú", close: "Cerrar", label: "Principal", skip: "Saltar al contenido", switchLang: "Cambiar idioma a inglés", toLight: "Cambiar a modo claro", toDark: "Cambiar a modo oscuro" },
   hero: {
-    label: "Cristian Ramirez · Full-Stack Developer",
+    label: "Full-Stack Developer",
     title: "Construyo productos digitales de principio a fin.",
     sub: "Diseño y desarrollo aplicaciones web modernas, escalables y orientadas a producto — desde la arquitectura y las APIs hasta la interfaz final.",
     stackNote: "Mi stack más fuerte es Django + Angular, pero mi stack es flexible: me adapto rápido a la herramienta que el proyecto necesita.",
@@ -64,7 +64,7 @@ const es = {
     num: "06", label: "GitHub", title: "Panel de ingeniería.", placeholder: "Datos en vivo pendientes",
     profile: "Perfil", repos: "Repositorios destacados", langs: "Mezcla de lenguajes", activity: "Actividad", oss: "Open source",
     ossText: "Espacio reservado para contribuciones open source. Se mostrarán cuando estén disponibles.",
-    slot: "Slot de repositorio", connect: "Conectar perfil de GitHub",
+    slot: "Slot de repositorio", connect: "Conectar perfil de GitHub", ph: "pendiente", stats: ["Repos", "Estrellas", "Seguidores"],
   },
   services: { num: "07", label: "Qué hago", items: [
     { t: "Desarrollo Full-Stack", d: "Aplicaciones web completas, del modelo de datos a la interfaz." },
@@ -78,13 +78,13 @@ const es = {
     name: "Nombre", email: "Email", message: "Mensaje", send: "Enviar mensaje",
     errName: "Escribe tu nombre.", errEmail: "Escribe un email válido.", errMsg: "El mensaje debe tener al menos 10 caracteres.", ok: "Gracias. Se abrirá tu cliente de correo para enviar el mensaje.", okFallback: "¿No se abrió? Escríbeme directamente a",
   },
-  footer: { tagline: "Designed & built with intention." },
+  footer: { tagline: "Diseñado y construido con intención." },
 };
 
 const en: typeof es = {
   nav: { home: "Home", about: "About", experience: "Experience", projects: "Projects", stack: "Stack", education: "Education", github: "GitHub", contact: "Contact", cta: "Let’s Talk", menu: "Menu", close: "Close", label: "Main", skip: "Skip to content", switchLang: "Switch language to Spanish", toLight: "Switch to light mode", toDark: "Switch to dark mode" },
   hero: {
-    label: "Cristian Ramirez · Full-Stack Developer",
+    label: "Full-Stack Developer",
     title: "I build digital products end to end.",
     sub: "I design and develop modern, scalable, product-oriented web applications — from architecture and APIs to the final interface.",
     stackNote: "My strongest stack is Django + Angular, but my stack is flexible: I adapt quickly to whatever the project needs.",
@@ -145,7 +145,7 @@ const en: typeof es = {
     num: "06", label: "GitHub", title: "Engineering dashboard.", placeholder: "Live data pending",
     profile: "Profile", repos: "Featured repositories", langs: "Language mix", activity: "Activity", oss: "Open source",
     ossText: "Reserved space for open-source contributions. They’ll appear here once available.",
-    slot: "Repository slot", connect: "Connect GitHub profile",
+    slot: "Repository slot", connect: "Connect GitHub profile", ph: "placeholder", stats: ["Repos", "Stars", "Followers"],
   },
   services: { num: "07", label: "What I do", items: [
     { t: "Full-Stack Development", d: "Complete web apps, from data model to interface." },
