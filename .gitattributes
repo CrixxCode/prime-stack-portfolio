@@ -1,0 +1,2 @@
+# Keep LF everywhere (matches the repo, Lovable and generated files like routeTree.gen.ts)
+* text=auto eol=lf
