@@ -166,9 +166,11 @@
 @keyframes float-y { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
 @keyframes pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
 @keyframes dash { to { stroke-dashoffset: -40 } }
-.anim-float { animation: float-y 6s ease-in-out infinite; }
-.anim-pulse { animation: pulse-dot 2.4s ease-in-out infinite; }
-.anim-dash { stroke-dasharray: 4 6; animation: dash 6s linear infinite; }
+/* Ambient loops stop on their own within 5s (WCAG 2.2.2: no auto-motion > 5s without a pause control).
+   Each ends on its resting frame, so nothing jumps when it stops (dash offset -40 = 4 × the 10px pattern). */
+.anim-float { animation: float-y 4.8s ease-in-out 1; }
+.anim-pulse { animation: pulse-dot 2.4s ease-in-out 2; }
+.anim-dash { stroke-dasharray: 4 6; animation: dash 4.8s var(--ease-out) 1; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
