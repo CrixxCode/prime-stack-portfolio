@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { useSite } from "@/lib/site";
+import { CONTACT } from "@/lib/i18n";
 
-const ids = ["home", "about", "experience", "projects", "stack", "education", "achievements", "github", "contact"] as const;
+const ids = ["home", "about", "projects", "stack", "experience", "education", "achievements", "github", "contact"] as const;
 
 export function Nav() {
   const { t, lang, setLang, theme, toggleTheme } = useSite();
@@ -21,13 +22,14 @@ export function Nav() {
     return () => window.removeEventListener("keydown", k);
   }, [open]);
 
-  const Controls = () => (
+  // Plain JSX, not a nested component: a component defined in render remounts on every render and drops keyboard focus.
+  const controls = (
     <div className="flex items-center gap-1">
-      <button onClick={() => setLang(lang === "es" ? "en" : "es")} aria-label={lang === "es" ? "Switch to English" : "Cambiar a español"}
+      <button type="button" onClick={() => setLang(lang === "es" ? "en" : "es")} aria-label={t.nav.switchLang}
         className="h-9 min-w-9 rounded-full px-2.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground">
         {lang === "es" ? "EN" : "ES"}
       </button>
-      <button onClick={toggleTheme} aria-label={theme === "dark" ? "Light mode" : "Dark mode"}
+      <button type="button" onClick={toggleTheme} aria-label={theme === "dark" ? t.nav.toLight : t.nav.toDark}
         className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground">
         {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       </button>
@@ -35,9 +37,11 @@ export function Nav() {
   );
 
   return (
+    <>
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">{t.nav.skip}</a>
     <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
-      <nav aria-label="Principal" className="flex w-full max-w-fit items-center gap-1 rounded-full border border-border-strong bg-nav p-1.5 shadow-soft backdrop-blur-xl">
-        <a href="#home" className="mr-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-foreground font-mono text-xs font-semibold text-background" aria-label={t.nav.home}>FS</a>
+      <nav aria-label={t.nav.label}className="flex w-full max-w-fit items-center gap-1 rounded-full border border-border-strong bg-nav p-1.5 shadow-soft backdrop-blur-xl">
+        <a href="#home" className="mr-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-foreground font-mono text-xs font-semibold text-background" aria-label={t.nav.home}>{CONTACT.initials}</a>
         <ul className="hidden items-center lg:flex">
           {ids.map((id) => (
             <li key={id}>
@@ -49,9 +53,9 @@ export function Nav() {
           ))}
         </ul>
         <span className="mx-1 hidden h-5 w-px bg-border-strong lg:block" />
-        <Controls />
+        {controls}
         <a href="#contact" className="ml-1 hidden rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition-transform hover:scale-[1.03] sm:block lg:hidden xl:block">{t.nav.cta}</a>
-        <button className="grid h-9 w-9 place-items-center rounded-full hover:bg-surface-2 lg:hidden" aria-expanded={open} aria-controls="mnav" aria-label={open ? t.nav.close : t.nav.menu} onClick={() => setOpen(!open)}>
+        <button type="button" className="grid h-9 w-9 place-items-center rounded-full hover:bg-surface-2 lg:hidden" aria-expanded={open} aria-controls="mnav" aria-label={open ? t.nav.close : t.nav.menu} onClick={() => setOpen(!open)}>
           {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </button>
       </nav>
@@ -70,5 +74,6 @@ export function Nav() {
         </div>
       )}
     </header>
+    </>
   );
 }

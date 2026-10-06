@@ -1,11 +1,11 @@
 /* Product UI compositions used in place of real screenshots. */
 const Bar = ({ w, c = "bg-surface-2" }: { w: string; c?: string }) => <div className={`h-1.5 rounded ${c}`} style={{ width: w }} />;
 
-export function HotelMock() {
+export function HotelMock({ label }: { label: string }) {
   const days = Array.from({ length: 28 });
   const booked = new Set([2, 3, 4, 9, 10, 15, 16, 17, 18, 23]);
   return (
-    <div className="grid h-full grid-cols-[110px_1fr] overflow-hidden rounded-xl border border-border-strong bg-card text-[10px] shadow-soft" role="img" aria-label="Hotel platform interface mockup">
+    <div className="grid h-full grid-cols-[110px_1fr] overflow-hidden rounded-xl border border-border-strong bg-card text-[10px] shadow-soft" role="img" aria-label={label}>
       <aside className="space-y-1 border-r border-border bg-surface p-3 font-mono">
         <div className="mb-3 font-sans text-xs font-semibold">Hotel·OS</div>
         {["Dashboard", "Reservas", "Clientes", "Habitaciones", "Facturación", "Reportes"].map((x, i) => (
@@ -32,10 +32,10 @@ export function HotelMock() {
   );
 }
 
-export function ExamMock() {
+export function ExamMock({ label }: { label: string }) {
   const bars = [62, 40, 78, 55, 70];
   return (
-    <div className="grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-xl border border-border-strong bg-card text-[10px] shadow-soft" role="img" aria-label="UniguajiraTest interface mockup">
+    <div className="grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-xl border border-border-strong bg-card text-[10px] shadow-soft" role="img" aria-label={label}>
       <header className="flex items-center justify-between border-b border-border px-4 py-2.5">
         <span className="text-xs font-semibold">UniguajiraTest</span>
         <span className="font-mono text-muted-foreground">simulacro · 24/35</span>

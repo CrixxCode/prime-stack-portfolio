@@ -1,9 +1,9 @@
 export type Lang = "es" | "en";
 
 const es = {
-  nav: { home: "Inicio", about: "Sobre mí", experience: "Experiencia", projects: "Proyectos", stack: "Stack", education: "Formación", achievements: "Logros", github: "GitHub", contact: "Contacto", cta: "Hablemos", menu: "Menú", close: "Cerrar" },
+  nav: { home: "Inicio", about: "Sobre mí", experience: "Experiencia", projects: "Proyectos", stack: "Stack", education: "Formación", achievements: "Logros", github: "GitHub", contact: "Contacto", cta: "Hablemos", menu: "Menú", close: "Cerrar", label: "Principal", skip: "Saltar al contenido", switchLang: "Cambiar idioma a inglés", toLight: "Cambiar a modo claro", toDark: "Cambiar a modo oscuro" },
   hero: {
-    label: "Full-Stack Developer",
+    label: "Cristian Ramirez · Full-Stack Developer",
     title: "Construyo productos digitales de principio a fin.",
     sub: "Diseño y desarrollo aplicaciones web modernas, escalables y orientadas a producto — desde la arquitectura y las APIs hasta la interfaz final.",
     stackNote: "Mi stack más fuerte es Django + Angular, pero mi stack es flexible: me adapto rápido a la herramienta que el proyecto necesita.",
@@ -15,7 +15,7 @@ const es = {
     p2: "Me atrae la arquitectura de software — cómo las decisiones de hoy afectan la mantenibilidad de mañana. Priorizo código legible, calidad verificable y una experiencia de usuario cuidada.",
     p3: "Tengo tecnologías preferidas, pero mi valor está en los fundamentos y en aprender nuevos stacks con rapidez.",
     quote: "Las herramientas cambian. La capacidad para construir soluciones no.",
-    photo: "Foto opcional",
+    photoAlt: "Retrato en blanco y negro de Cristian Ramirez",
   },
   stats: [
     { v: "10+", l: "Tecnologías utilizadas" },
@@ -25,7 +25,7 @@ const es = {
   ],
   projects: {
     num: "02", label: "Proyectos destacados", title: "Casos de estudio.",
-    problem: "Problema", role: "Rol", features: "Funciones clave", stack: "Stack", status: "Estado", repo: "Repositorio", private: "Privado / no público", cta: "Ver caso de estudio", soon: "Caso de estudio próximamente",
+    problem: "Problema", role: "Rol", features: "Funciones clave", stack: "Stack", status: "Estado", repo: "Repositorio", private: "Privado / no público", cta: "Ver caso de estudio", soon: "Caso de estudio próximamente", mock: "Maqueta de la interfaz",
     items: [
       { name: "Plataforma de gestión hotelera", tag: "Riohacha · Académico", desc: "Plataforma web full-stack para centralizar la información operativa de hoteles en Riohacha.", problem: "La gestión de reservas, clientes y habitaciones dispersa en hojas de cálculo genera errores y poca visibilidad.", role: "Desarrollo full-stack: modelado de datos, API y frontend.", features: ["Reservas y disponibilidad", "Clientes y habitaciones", "Facturación (concepto)", "Reportes operativos"], stack: ["Django", "Angular", "PostgreSQL"], status: "Caso académico / producto" },
       { name: "UniguajiraTest", tag: "EdTech · Saber Pro", desc: "Plataforma de preparación y evaluación para las pruebas Saber Pro.", problem: "Los estudiantes carecen de un entorno estructurado para diagnosticar y entrenar sus competencias antes del examen.", role: "Desarrollo full-stack y diseño de la experiencia.", features: ["Práctica y diagnóstico", "Entrenamiento por competencias", "Simulacros", "Retroalimentación y analítica"], stack: ["Django", "Angular", "PostgreSQL"], status: "En desarrollo" },
@@ -44,7 +44,7 @@ const es = {
     adaptText: "Los patrones se transfieren: HTTP, modelado de datos, componentes, estado, testing. Por eso paso de un framework a otro sin empezar de cero.",
   },
   experience: {
-    num: "04", label: "Experiencia", company: "ALGORITHM S.A.S.", role: "Full-Stack Developer", date: "1 junio 2026 – Actualidad", current: "Actual",
+    num: "04", label: "Experiencia", company: "ALGORITHM S.A.S.", role: "Full-Stack Developer", start: "2026-06-01", present: "Actualidad", current: "Actual",
     items: ["Desarrollo y mantenimiento de funcionalidades frontend y backend.", "Diseño y consumo de APIs e integración de datos.", "Depuración, pruebas y mejora de calidad del código.", "Colaboración con el equipo e iteración continua del producto."],
     note: "Los detalles de proyectos internos se mantienen confidenciales.",
   },
@@ -72,31 +72,31 @@ const es = {
     { t: "Frontend", d: "Interfaces rápidas, accesibles y consistentes." },
     { t: "Productos / MVPs y SaaS", d: "Del concepto a una primera versión que se puede usar." },
   ] },
-  blog: { num: "09", label: "Blog", title: "Writing soon.", text: "Notas sobre arquitectura, Django, Angular, bases de datos, decisiones técnicas y lecciones aprendidas.", topics: ["Arquitectura", "Django", "Angular", "Full-Stack", "Bases de datos", "Decisiones técnicas"] },
+  blog: { num: "09", label: "Blog", title: "Próximamente.", text: "Notas sobre arquitectura, Django, Angular, bases de datos, decisiones técnicas y lecciones aprendidas.", topics: ["Arquitectura", "Django", "Angular", "Full-Stack", "Bases de datos", "Decisiones técnicas"] },
   contact: {
     num: "10", label: "Contacto", title: "Construyamos algo juntos.", text: "¿Tienes un producto, una oportunidad o una idea? Escríbeme.",
     name: "Nombre", email: "Email", message: "Mensaje", send: "Enviar mensaje",
-    errName: "Escribe tu nombre.", errEmail: "Escribe un email válido.", errMsg: "El mensaje debe tener al menos 10 caracteres.", ok: "Gracias. Se abrirá tu cliente de correo para enviar el mensaje.",
+    errName: "Escribe tu nombre.", errEmail: "Escribe un email válido.", errMsg: "El mensaje debe tener al menos 10 caracteres.", ok: "Gracias. Se abrirá tu cliente de correo para enviar el mensaje.", okFallback: "¿No se abrió? Escríbeme directamente a",
   },
   footer: { tagline: "Designed & built with intention." },
 };
 
 const en: typeof es = {
-  nav: { home: "Home", about: "About", experience: "Experience", projects: "Projects", stack: "Stack", education: "Education", achievements: "Awards", github: "GitHub", contact: "Contact", cta: "Let's talk", menu: "Menu", close: "Close" },
+  nav: { home: "Home", about: "About", experience: "Experience", projects: "Projects", stack: "Stack", education: "Education", achievements: "Awards", github: "GitHub", contact: "Contact", cta: "Let’s Talk", menu: "Menu", close: "Close", label: "Main", skip: "Skip to content", switchLang: "Switch language to Spanish", toLight: "Switch to light mode", toDark: "Switch to dark mode" },
   hero: {
-    label: "Full-Stack Developer",
+    label: "Cristian Ramirez · Full-Stack Developer",
     title: "I build digital products end to end.",
     sub: "I design and develop modern, scalable, product-oriented web applications — from architecture and APIs to the final interface.",
     stackNote: "My strongest stack is Django + Angular, but my stack is flexible: I adapt quickly to whatever the project needs.",
-    cta: "Let's talk", cta2: "View projects", status: "Open to opportunities",
+    cta: "Let’s Talk", cta2: "View Projects", status: "Open to opportunities",
   },
   about: {
     num: "01", label: "About", title: "Engineering with product judgment.",
     p1: "I work across frontend and backend with equal care: clear data models, predictable APIs and interfaces that feel simple. I care about building complete products, not isolated pieces.",
-    p2: "I'm drawn to software architecture — how today's decisions shape tomorrow's maintainability. I prioritize readable code, verifiable quality and a considered user experience.",
+    p2: "I’m drawn to software architecture — how today’s decisions shape tomorrow’s maintainability. I prioritize readable code, verifiable quality and a considered user experience.",
     p3: "I have preferred technologies, but my value lies in fundamentals and learning new stacks fast.",
-    quote: "Tools change. The ability to build solutions doesn't.",
-    photo: "Optional photo",
+    quote: "Tools change. The ability to build solutions doesn’t.",
+    photoAlt: "Black-and-white portrait of Cristian Ramirez",
   },
   stats: [
     { v: "10+", l: "Technologies used" },
@@ -106,7 +106,7 @@ const en: typeof es = {
   ],
   projects: {
     num: "02", label: "Featured projects", title: "Case studies.",
-    problem: "Problem", role: "Role", features: "Key features", stack: "Stack", status: "Status", repo: "Repository", private: "Private / not public", cta: "View case study", soon: "Case study coming soon",
+    problem: "Problem", role: "Role", features: "Key features", stack: "Stack", status: "Status", repo: "Repository", private: "Private / not public", cta: "View Case Study", soon: "Case study coming soon", mock: "Interface mockup",
     items: [
       { name: "Hotel management platform", tag: "Riohacha · Academic", desc: "Full-stack web platform to centralize hotel operations data in Riohacha.", problem: "Reservations, clients and rooms scattered across spreadsheets cause errors and poor visibility.", role: "Full-stack development: data modeling, API and frontend.", features: ["Reservations & availability", "Clients & rooms", "Billing (concept)", "Operational reports"], stack: ["Django", "Angular", "PostgreSQL"], status: "Academic / product case" },
       { name: "UniguajiraTest", tag: "EdTech · Saber Pro", desc: "Preparation and assessment platform for the Saber Pro exams.", problem: "Students lack a structured environment to diagnose and train their skills before the exam.", role: "Full-stack development and experience design.", features: ["Practice & diagnosis", "Skill-based training", "Mock exams", "Feedback & analytics"], stack: ["Django", "Angular", "PostgreSQL"], status: "In development" },
@@ -122,10 +122,10 @@ const en: typeof es = {
       { name: "Tools", items: [["Docker", ""], ["Git", ""], ["Postman", ""], ["WSL", ""]] },
     ],
     adaptTitle: "Flexible stack. Solid fundamentals.",
-    adaptText: "Patterns transfer: HTTP, data modeling, components, state, testing. That's why I move between frameworks without starting from zero.",
+    adaptText: "Patterns transfer: HTTP, data modeling, components, state, testing. That’s why I move between frameworks without starting from zero.",
   },
   experience: {
-    num: "04", label: "Experience", company: "ALGORITHM S.A.S.", role: "Full-Stack Developer", date: "June 1, 2026 – Present", current: "Current",
+    num: "04", label: "Experience", company: "ALGORITHM S.A.S.", role: "Full-Stack Developer", start: "2026-06-01", present: "Present", current: "Current",
     items: ["Building and maintaining frontend and backend features.", "Designing and consuming APIs and integrating data.", "Debugging, testing and improving code quality.", "Collaborating with the team and iterating on the product."],
     note: "Internal project details remain confidential.",
   },
@@ -136,7 +136,7 @@ const en: typeof es = {
   achievements: {
     num: "06", label: "Achievements", title: "Results, not diplomas.",
     items: [
-      { t: "High Saber Pro performance", d: "Outstanding result in Colombia's national higher-education assessment.", k: "Academic" },
+      { t: "High Saber Pro performance", d: "Outstanding result in Colombia’s national higher-education assessment.", k: "Academic" },
       { t: "University hackathon winner", d: "First place building a working solution under time pressure.", k: "Hackathon" },
       { t: "Top 10 national hackathon", d: "Among the ten best teams nationwide.", k: "Hackathon" },
     ],
@@ -144,7 +144,7 @@ const en: typeof es = {
   github: {
     num: "07", label: "GitHub", title: "Engineering dashboard.", placeholder: "Live data pending",
     profile: "Profile", repos: "Featured repositories", langs: "Language mix", activity: "Activity", oss: "Open source",
-    ossText: "Reserved space for open-source contributions. They'll appear here once available.",
+    ossText: "Reserved space for open-source contributions. They’ll appear here once available.",
     slot: "Repository slot", connect: "Connect GitHub profile",
   },
   services: { num: "08", label: "What I do", items: [
@@ -155,9 +155,9 @@ const en: typeof es = {
   ] },
   blog: { num: "09", label: "Blog", title: "Writing soon.", text: "Notes on architecture, Django, Angular, databases, technical decisions and lessons learned.", topics: ["Architecture", "Django", "Angular", "Full-Stack", "Databases", "Tech decisions"] },
   contact: {
-    num: "10", label: "Contact", title: "Let's build something together.", text: "Have a product, an opportunity or an idea? Get in touch.",
-    name: "Name", email: "Email", message: "Message", send: "Send message",
-    errName: "Please enter your name.", errEmail: "Please enter a valid email.", errMsg: "Message must be at least 10 characters.", ok: "Thanks. Your email client will open to send the message.",
+    num: "10", label: "Contact", title: "Let’s build something together.", text: "Have a product, an opportunity or an idea? Get in touch.",
+    name: "Name", email: "Email", message: "Message", send: "Send Message",
+    errName: "Please enter your name.", errEmail: "Please enter a valid email.", errMsg: "Message must be at least 10 characters.", ok: "Thanks. Your email client will open to send the message.", okFallback: "Didn’t open? Email me directly at",
   },
   footer: { tagline: "Designed & built with intention." },
 };
@@ -165,4 +165,11 @@ const en: typeof es = {
 export const dict = { es, en };
 export type Dict = typeof es;
 
-export const CONTACT = { email: "hola@example.dev", linkedin: "#", github: "#" };
+export const CONTACT = {
+  name: "Cristian Ramirez",
+  initials: "CR",
+  email: "cristiandanrave@gmail.com",
+  linkedin: "https://www.linkedin.com/in/cristian-daniel-ramirez-vega-17783a3b9",
+  github: "https://github.com/CrixxCode",
+  githubUser: "CrixxCode",
+};

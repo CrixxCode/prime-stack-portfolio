@@ -68,9 +68,9 @@ export function Hero() {
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">{h.sub}</p>
           <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted-foreground">{h.stackNote}</p>
-          <ul className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-foreground" aria-label="Stack">
+          <ul translate="no" className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-foreground" aria-label="Stack">
             {["Django", "Angular", ".NET", "React", "PostgreSQL"].map((s, i) => (
-              <li key={s} className="flex items-center gap-3">{i > 0 && <span className="text-muted-foreground">·</span>}{s}</li>
+              <li key={s} className="flex items-center gap-3">{i > 0 && <span className="text-muted-foreground" aria-hidden="true">·</span>}{s}</li>
             ))}
           </ul>
           <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -87,7 +87,7 @@ export function Hero() {
         </div>
         <div className="flex justify-center lg:justify-end"><Avatar /></div>
       </div>
-      <div className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground md:block">scroll ↓</div>
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground md:block">scroll ↓</div>
     </section>
   );
 }

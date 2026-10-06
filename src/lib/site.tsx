@@ -4,21 +4,31 @@ import { dict, type Dict, type Lang } from "./i18n";
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: Dict; theme: "light" | "dark"; toggleTheme: () => void };
 const SiteCtx = createContext<Ctx | null>(null);
 
+// Match --background in styles.css; used for <meta name="theme-color">.
+export const THEME_COLORS = { light: "#faf9f6", dark: "#0a0a0b" } as const;
+const syncThemeColor = (theme: "light" | "dark") =>
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[theme]);
+
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [lang, setLangS] = useState<Lang>("es");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   useEffect(() => {
-    setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
-    const l = localStorage.getItem("lang");
+    const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+    setTheme(current);
+    syncThemeColor(current);
+    let l: string | null = null;
+    try { l = localStorage.getItem("lang"); } catch { /* storage unavailable */ }
     if (l === "en" || l === "es") setLangS(l);
+    else if (!navigator.languages.some((x) => x.toLowerCase().startsWith("es")) && navigator.languages.some((x) => x.toLowerCase().startsWith("en"))) setLangS("en");
   }, []);
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
-  const setLang = (l: Lang) => { setLangS(l); localStorage.setItem("lang", l); };
+  const setLang = (l: Lang) => { setLangS(l); try { localStorage.setItem("lang", l); } catch { /* storage unavailable */ } };
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     document.documentElement.classList.toggle("dark", next === "dark");
-    localStorage.setItem("theme", next);
+    syncThemeColor(next);
+    try { localStorage.setItem("theme", next); } catch { /* storage unavailable */ }
   };
   return <SiteCtx.Provider value={{ lang, setLang, t: dict[lang], theme, toggleTheme }}>{children}</SiteCtx.Provider>;
 }

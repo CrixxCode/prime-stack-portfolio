@@ -39,6 +39,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.75rem;
   --background: oklch(0.982 0.004 85);
   --foreground: oklch(0.24 0.008 260);
@@ -70,6 +71,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0.003 286);
   --foreground: oklch(0.955 0.008 85);
   --surface: oklch(0.18 0.004 270);
@@ -93,16 +95,17 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6rem; -webkit-tap-highlight-color: transparent; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss01", "cv11";
+    touch-action: manipulation;
   }
   ::selection { background: color-mix(in oklab, var(--primary) 30%, transparent); }
-  :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 6px; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 }
 
 @utility shadow-soft { box-shadow: var(--shadow-soft); }
@@ -117,9 +120,10 @@
 @utility container-x { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: 1.25rem;
   @media (min-width: 768px) { padding-inline: 2.5rem; } }
 
-/* Reveal */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity 600ms cubic-bezier(.2,.7,.2,1), transform 600ms cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
-.reveal[data-visible="true"] { opacity: 1; transform: none; }
+/* Reveal — only hidden when JS runs (html.js), so content stays visible without JS */
+.reveal { transition: opacity 600ms cubic-bezier(.2,.7,.2,1), transform 600ms cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+.js .reveal { opacity: 0; transform: translateY(18px); }
+.js .reveal[data-visible="true"] { opacity: 1; transform: none; }
 
 @keyframes float-y { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
 @keyframes pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
@@ -130,7 +134,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .js .reveal { opacity: 1; transform: none; transition: none; }
   .anim-float, .anim-pulse, .anim-dash { animation: none; }
-  * { transition-duration: 1ms !important; }
+  *, ::before, ::after { transition-duration: 1ms !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }
