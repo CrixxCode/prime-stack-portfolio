@@ -21,7 +21,7 @@ const es = {
     { v: "10+", l: "Tecnologías utilizadas" },
     { v: "2", l: "Proyectos destacados" },
     { v: "Full-Stack", l: "Frontend + Backend" },
-    { v: "B2", l: "English Level" },
+    { v: "B2", l: "Nivel de inglés" },
   ],
   projects: {
     num: "01", label: "Proyectos destacados", title: "Casos de estudio.",

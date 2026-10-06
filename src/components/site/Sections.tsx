@@ -41,8 +41,13 @@ export function About() {
         </Reveal>
       </div>
       <Reveal className="mt-20 border-y border-border py-10 md:mt-28 md:py-14">
-        <blockquote className="max-w-4xl text-[clamp(1.6rem,3.6vw,2.9rem)] font-medium leading-[1.12] tracking-[-0.03em]">
-          <span className="text-primary">“</span>{a.quote}<span className="text-primary">”</span>
+        <blockquote className="mx-auto max-w-5xl text-center font-serif text-[clamp(2rem,4.6vw,3.75rem)] italic leading-[1.1] tracking-[-0.01em] text-balance">
+          {/* One sentence per line from sm up; free flow on mobile */}
+          {a.quote.split(/(?<=\.)\s+/).map((line, i, all) => (
+            <span key={i} className="sm:block">
+              {i === 0 && <span className="text-primary">“</span>}{line}{i === all.length - 1 ? <span className="text-primary">”</span> : " "}
+            </span>
+          ))}
         </blockquote>
       </Reveal>
       <dl className="mt-14 grid grid-cols-2 border-l border-t border-border md:grid-cols-4">
