@@ -3,6 +3,7 @@ import { ArrowRight, Award, Clock, Code2, Github, Linkedin, Lock, Mail, Trophy, 
 import { Reveal, useSite } from "@/lib/site";
 import { CONTACT } from "@/lib/i18n";
 import { HotelMock, ExamMock } from "./Mocks";
+import { BrandLogo } from "./Brand";
 
 const titleClass = "max-w-3xl text-[clamp(2rem,4.6vw,3.75rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance";
 
@@ -361,7 +362,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border">
       <div className="container-x flex flex-col gap-6 py-10 text-sm md:flex-row md:items-center md:justify-between">
-        <div><div className="font-medium">{CONTACT.name}</div><div className="mt-1 font-mono text-xs text-muted-foreground">{t.footer.tagline}</div></div>
+        <div className="flex items-center gap-3"><BrandLogo className="h-10 w-10" /><div><div className="font-medium">{CONTACT.name}</div><div className="mt-1 font-mono text-xs text-muted-foreground">{t.footer.tagline}</div></div></div>
         <ul className="flex flex-wrap items-center gap-1 text-muted-foreground">
           <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={CONTACT.github}>GitHub</a></li>
           <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={CONTACT.linkedin}>LinkedIn</a></li>

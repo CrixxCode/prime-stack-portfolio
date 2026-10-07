@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteProvider } from "@/lib/site";
 import { Nav } from "@/components/site/Nav";
 import { Hero } from "@/components/site/Hero";
+import { BrandBanner } from "@/components/site/Brand";
 import { About, Projects, Stack, Experience, Education, GitHubPanel, Services, Blog, Contact, Footer } from "@/components/site/Sections";
 
 const title = "Cristian Ramirez — Full-Stack Developer (Django + Angular)";
@@ -27,6 +28,7 @@ function Index() {
       <Nav />
       <main id="main">
         <Hero />
+        <BrandBanner />
         <Projects />
         <About />
         <Stack />
