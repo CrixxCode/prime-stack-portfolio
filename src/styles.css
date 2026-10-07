@@ -170,11 +170,12 @@
 @keyframes float-y { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
 @keyframes pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
 @keyframes dash { to { stroke-dashoffset: -40 } }
-/* Ambient loops stop on their own within 5s (WCAG 2.2.2: no auto-motion > 5s without a pause control).
-   Each ends on its resting frame, so nothing jumps when it stops (dash offset -40 = 4 × the 10px pattern). */
+/* Float and pulse stop on their own within 5s (WCAG 2.2.2). The dash loop runs continuously by design:
+   Hero.tsx slows it to an ambient pace after load, speeds it up on hover and pauses it off screen.
+   Its loop is seamless because the -40 offset is 4 × the 10px dash pattern. */
 .anim-float { animation: float-y 4.8s ease-in-out 1; }
 .anim-pulse { animation: pulse-dot 2.4s ease-in-out 2; }
-.anim-dash { stroke-dasharray: 4 6; animation: dash 4.8s var(--ease-out) 1; }
+.anim-dash { stroke-dasharray: 4 6; animation: dash 2.4s linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

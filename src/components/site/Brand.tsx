@@ -22,7 +22,19 @@ export function BrandLogo({ className = "h-9 w-9" }: { className?: string }) {
   );
 }
 
-/** Horizontal logo below the hero in the theme's variant, or a dashed placeholder until set. */
+/** Horizontal logo (mark + name + role) in the theme's variant. `className` sets its size. */
+export function BrandHorizontal({ className }: { className: string }) {
+  const { t } = useSite();
+  const { light, dark } = BRAND.banner;
+  return (
+    <>
+      <img src={light.src} alt={t.brand.bannerAlt} width={light.width} height={light.height} loading="lazy" decoding="async" className={`${className} h-auto dark:hidden`} />
+      <img src={dark.src} alt={t.brand.bannerAlt} width={dark.width} height={dark.height} loading="lazy" decoding="async" className={`${className} hidden h-auto dark:block`} />
+    </>
+  );
+}
+
+/** Horizontal logo below the hero, or a dashed placeholder until set. */
 export function BrandBanner() {
   const { t } = useSite();
   const { light, dark } = BRAND.banner;
@@ -30,8 +42,7 @@ export function BrandBanner() {
     <div className="container-x pb-16">
       {light.src && dark.src ? (
         <div className="flex justify-center py-6 md:py-10">
-          <img src={light.src} alt={t.brand.bannerAlt} width={light.width} height={light.height} loading="lazy" decoding="async" className="h-auto w-full max-w-[560px] dark:hidden" />
-          <img src={dark.src} alt={t.brand.bannerAlt} width={dark.width} height={dark.height} loading="lazy" decoding="async" className="hidden h-auto w-full max-w-[560px] dark:block" />
+          <BrandHorizontal className="w-full max-w-[560px]" />
         </div>
       ) : (
         <div aria-hidden="true" className="grid aspect-[4/1] w-full place-items-center rounded-2xl border border-dashed border-border-strong bg-surface/50 font-mono text-xs text-muted-foreground">

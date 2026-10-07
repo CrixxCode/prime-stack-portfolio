@@ -1,10 +1,49 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowDownRight, ArrowRight } from "lucide-react";
 import { useSite } from "@/lib/site";
 import { CONTACT } from "@/lib/i18n";
 
+// Connection lines: normal speed on load, then they slow to an ambient pace; hovering the drawing
+// brings them back to normal. Speed changes go through playbackRate, which keeps the current
+// position (changing the CSS duration would make the dashes jump).
+const DASH_SLOW = 0.25;
+
+function useDashSpeed(svg: React.RefObject<SVGSVGElement | null>) {
+  const rampRef = useRef<(target: number, ms: number) => void>(() => {});
+  useEffect(() => {
+    const el = svg.current;
+    if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // document.getAnimations(): Chrome's svg.getAnimations({ subtree: true }) misses the lines' CSS animations
+    const dashes = () => document.getAnimations().filter((a) =>
+      (a as CSSAnimation).animationName === "dash" && el.contains((a.effect as KeyframeEffect | null)?.target ?? null));
+    let rate = 1, raf = 0;
+    rampRef.current = (target, ms) => {
+      cancelAnimationFrame(raf);
+      const from = rate, t0 = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / ms);
+        rate = from + (target - from) * (1 - (1 - p) ** 3); // ease-out
+        dashes().forEach((a) => (a.playbackRate = rate));
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    const slowDown = setTimeout(() => rampRef.current(DASH_SLOW, 1500), 3000);
+    // Pause while the hero is off screen; nobody sees it and it saves work.
+    const io = new IntersectionObserver(([e]) => dashes().forEach((a) => (e?.isIntersecting ? a.play() : a.pause())));
+    io.observe(el);
+    return () => { clearTimeout(slowDown); cancelAnimationFrame(raf); io.disconnect(); };
+  }, [svg]);
+  return {
+    speedUp: () => rampRef.current(1, 400),
+    slowDown: () => rampRef.current(DASH_SLOW, 1200),
+  };
+}
+
 function Avatar() {
   const ref = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const dash = useDashSpeed(svgRef);
   const onMove = (e: React.PointerEvent) => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
@@ -15,14 +54,15 @@ function Avatar() {
   const onLeave = () => {
     ref.current?.style.setProperty("--mx", "0");
     ref.current?.style.setProperty("--my", "0");
+    dash.slowDown();
   };
   const layer = (k: number) => ({ transform: `translate3d(calc(var(--mx,0) * ${k}px), calc(var(--my,0) * ${k}px), 0)`, transition: "transform 500ms cubic-bezier(.2,.7,.2,1)" });
   const nodes = [[90, 70], [250, 60], [330, 170], [170, 200], [70, 300], [280, 320], [200, 400]] as const;
   const edges = [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [3, 5], [4, 6], [5, 6], [2, 5]] as const;
   return (
-    <div ref={ref} onPointerMove={onMove} onPointerLeave={onLeave} className="relative aspect-[4/5] w-full max-w-md" aria-hidden="true">
+    <div ref={ref} onPointerEnter={dash.speedUp} onPointerMove={onMove} onPointerLeave={onLeave} className="relative aspect-[4/5] w-full max-w-md" aria-hidden="true">
       <div className="absolute inset-0 rounded-2xl border border-border bg-surface bg-grid [mask-image:radial-gradient(closest-side,black,transparent)]" />
-      <svg viewBox="0 0 400 500" className="absolute inset-0 h-full w-full" style={layer(10)}>
+      <svg ref={svgRef} viewBox="0 0 400 500" className="absolute inset-0 h-full w-full" style={layer(10)}>
         {/* head silhouette made of geometry */}
         <circle cx="200" cy="170" r="92" fill="none" stroke="var(--border-strong)" />
         <circle cx="200" cy="170" r="62" fill="none" stroke="var(--border-strong)" strokeDasharray="2 5" />

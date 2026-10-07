@@ -78,7 +78,6 @@ const es = {
     name: "Nombre", email: "Email", message: "Mensaje", send: "Enviar mensaje",
     errName: "Escribe tu nombre.", errEmail: "Escribe un email válido.", errMsg: "El mensaje debe tener al menos 10 caracteres.", ok: "Gracias. Se abrirá tu cliente de correo para enviar el mensaje.", okFallback: "¿No se abrió? Escríbeme directamente a",
   },
-  footer: { tagline: "Diseñado y construido con intención." },
   brand: { logo: "Logo", banner: "Banner de marca", bannerAlt: "Logotipo de Cristian Ramirez, Full-Stack Developer" },
 };
 
@@ -160,7 +159,6 @@ const en: typeof es = {
     name: "Name", email: "Email", message: "Message", send: "Send Message",
     errName: "Please enter your name.", errEmail: "Please enter a valid email.", errMsg: "Message must be at least 10 characters.", ok: "Thanks. Your email client will open to send the message.", okFallback: "Didn’t open? Email me directly at",
   },
-  footer: { tagline: "Designed & built with intention." },
   brand: { logo: "Logo", banner: "Brand banner", bannerAlt: "Cristian Ramirez, Full-Stack Developer logo" },
 };
 
