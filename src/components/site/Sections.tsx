@@ -202,7 +202,7 @@ export function Education() {
       <div className="mt-16 md:mt-24">
         <Reveal><h3 className="mb-6 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{a.label}</h3></Reveal>
         <div className="grid gap-4 md:grid-cols-3">
-          {a.items.map((x, i) => { const I = icons[i]; return (
+          {a.items.map((x, i) => { const I = icons[i] ?? Award; return (
             <Reveal key={x.t} delay={i * 40}>
               <article className="h-full rounded-xl border border-border bg-card p-6">
                 <div className="flex items-center justify-between"><I className="h-5 w-5 text-primary" aria-hidden="true" /><span className="font-mono text-xs text-muted-foreground">{x.k}</span></div>
@@ -280,7 +280,7 @@ export function Services() {
     <section className="container-x py-24 md:py-32">
       <Head num={s.num} label={s.label} labelIsHeading />
       <ul className="divide-y divide-border border-y border-border">
-        {s.items.map((x, i) => { const I = icons[i]; return (
+        {s.items.map((x, i) => { const I = icons[i] ?? Layers; return (
           <Reveal as="li" key={x.t} delay={i * 30} className="group grid grid-cols-[auto_1fr] items-center gap-5 py-6 md:grid-cols-[60px_1fr_1fr] md:py-8">
             <I className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" aria-hidden="true" />
             <h3 className="text-xl font-semibold tracking-tight md:text-3xl">{x.t}</h3>
@@ -309,13 +309,14 @@ export function Blog() {
 
 export function Contact() {
   const { t } = useSite(); const c = t.contact;
-  const [errs, setErrs] = useState<Record<string, string>>({});
+  type Field = "name" | "email" | "message";
+  const [errs, setErrs] = useState<Partial<Record<Field, string>>>({});
   const [ok, setOk] = useState(false);
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const name = String(f.get("name") || "").trim(), email = String(f.get("email") || "").trim(), msg = String(f.get("message") || "").trim();
-    const n: Record<string, string> = {};
+    const n: Partial<Record<Field, string>> = {};
     if (!name || name.length > 100) n.name = c.errName;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) n.email = c.errEmail;
     if (msg.length < 10 || msg.length > 2000) n.message = c.errMsg;

@@ -17,7 +17,8 @@ function Avatar() {
     ref.current?.style.setProperty("--my", "0");
   };
   const layer = (k: number) => ({ transform: `translate3d(calc(var(--mx,0) * ${k}px), calc(var(--my,0) * ${k}px), 0)`, transition: "transform 500ms cubic-bezier(.2,.7,.2,1)" });
-  const nodes = [[90, 70], [250, 60], [330, 170], [170, 200], [70, 300], [280, 320], [200, 400]];
+  const nodes = [[90, 70], [250, 60], [330, 170], [170, 200], [70, 300], [280, 320], [200, 400]] as const;
+  const edges = [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [3, 5], [4, 6], [5, 6], [2, 5]] as const;
   return (
     <div ref={ref} onPointerMove={onMove} onPointerLeave={onLeave} className="relative aspect-[4/5] w-full max-w-md" aria-hidden="true">
       <div className="absolute inset-0 rounded-2xl border border-border bg-surface bg-grid [mask-image:radial-gradient(closest-side,black,transparent)]" />
@@ -28,7 +29,7 @@ function Avatar() {
         <path d="M70 470 C 80 340, 320 340, 330 470" fill="none" stroke="var(--border-strong)" />
         <line x1="200" y1="20" x2="200" y2="480" stroke="var(--border)" />
         <line x1="30" y1="170" x2="370" y2="170" stroke="var(--border)" />
-        {[[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [3, 5], [4, 6], [5, 6], [2, 5]].map(([a, b], i) => (
+        {edges.map(([a, b], i) => (
           <line key={i} x1={nodes[a][0]} y1={nodes[a][1]} x2={nodes[b][0]} y2={nodes[b][1]} stroke="var(--primary)" strokeOpacity="0.5" className="anim-dash" />
         ))}
         {nodes.map(([x, y], i) => (
