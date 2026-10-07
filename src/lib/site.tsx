@@ -9,20 +9,31 @@ export const THEME_COLORS = { light: "#faf9f6", dark: "#0a0a0b" } as const;
 const syncThemeColor = (theme: "light" | "dark") =>
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[theme]);
 
-export function SiteProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangS] = useState<Lang>("es");
+// `initialLang` comes from ?lang= in the URL: it wins over the stored or browser language,
+// and the server renders that language directly (no flash).
+export function SiteProvider({ children, initialLang }: { children: ReactNode; initialLang?: Lang | undefined }) {
+  const [lang, setLangS] = useState<Lang>(initialLang ?? "es");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   useEffect(() => {
     const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
     setTheme(current);
     syncThemeColor(current);
+    if (initialLang) return;
     let l: string | null = null;
     try { l = localStorage.getItem("lang"); } catch { /* storage unavailable */ }
     if (l === "en" || l === "es") setLangS(l);
     else if (!navigator.languages.some((x) => x.toLowerCase().startsWith("es")) && navigator.languages.some((x) => x.toLowerCase().startsWith("en"))) setLangS("en");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initial values only
   }, []);
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
-  const setLang = (l: Lang) => { setLangS(l); try { localStorage.setItem("lang", l); } catch { /* storage unavailable */ } };
+  const setLang = (l: Lang) => {
+    setLangS(l);
+    try { localStorage.setItem("lang", l); } catch { /* storage unavailable */ }
+    // Keep the address shareable: it always says which language is showing.
+    const url = new URL(window.location.href);
+    url.searchParams.set("lang", l);
+    window.history.replaceState(window.history.state, "", url);
+  };
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);

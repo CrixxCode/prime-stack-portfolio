@@ -218,7 +218,13 @@ export function Education() {
 
 export function GitHubPanel() {
   const { t } = useSite(); const g = t.github;
-  const cells = Array.from({ length: 7 * 40 }, (_, i) => ((i * 37) % 11) / 10);
+  // Activity heatmap as one SVG: one path per intensity level instead of 280 divs.
+  // Cells are 10px with a 3px gap, filled column by column (7 rows × 40 weeks).
+  const levels = Array.from({ length: 11 }, () => "");
+  for (let i = 0; i < 7 * 40; i++) {
+    const x = Math.floor(i / 7) * 13 + 1, y = (i % 7) * 13 + 1;
+    levels[(i * 37) % 11] += `M${x} ${y}h8v8h-8z`; // 8px square + 2px round stroke = 10px with soft corners
+  }
   const Ph = () => <span className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{g.ph}</span>;
   return (
     <section id="github" className="flex min-h-dvh items-center bg-surface/40 py-24 md:py-36">
@@ -243,9 +249,9 @@ export function GitHubPanel() {
             <div className="space-y-6 p-6 lg:col-span-8">
               <div>
                 <div className="mb-3 flex items-center justify-between"><h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.activity}</h3><Ph /></div>
-                <div className="overflow-x-auto"><div className="grid w-max grid-flow-col grid-rows-7 gap-[3px]" aria-hidden="true">
-                  {cells.map((v, i) => <div key={i} className="h-2.5 w-2.5 rounded-[2px] bg-primary" style={{ opacity: 0.06 + v * 0.25 }} />)}
-                </div></div>
+                <div className="overflow-x-auto"><svg width={40 * 13 - 3} height={7 * 13 - 3} aria-hidden="true" className="block">
+                  {levels.map((d, v) => <path key={v} d={d} fill="var(--primary)" stroke="var(--primary)" strokeWidth={2} strokeLinejoin="round" opacity={0.06 + (v / 10) * 0.25} />)}
+                </svg></div>
               </div>
               <div>
                 <h3 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.repos}</h3>

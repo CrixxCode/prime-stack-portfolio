@@ -108,6 +108,8 @@
 @layer base {
   * { border-color: var(--color-border); }
   html { scroll-behavior: smooth; scroll-padding-top: 6rem; -webkit-tap-highlight-color: transparent; }
+  /* No rubber-band bounce with mouse/trackpad; touch keeps native pull-to-refresh and swipe navigation */
+  @media (pointer: fine) { html { overscroll-behavior: none; } }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

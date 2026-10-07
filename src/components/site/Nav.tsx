@@ -22,11 +22,20 @@ export function Nav() {
     ids.forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
     return () => io.disconnect();
   }, []);
+  // While open, the menu closes on Escape, on a tap outside the header, or when the page scrolls.
   useEffect(() => {
     if (!open) return;
-    const k = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const close = () => setOpen(false);
+    const k = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const outside = (e: PointerEvent) => !(e.target as Element).closest("header") && close();
     window.addEventListener("keydown", k);
-    return () => window.removeEventListener("keydown", k);
+    document.addEventListener("pointerdown", outside);
+    window.addEventListener("scroll", close, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", k);
+      document.removeEventListener("pointerdown", outside);
+      window.removeEventListener("scroll", close);
+    };
   }, [open]);
 
   // Plain JSX, not a nested component: a component defined in render remounts on every render and drops keyboard focus.

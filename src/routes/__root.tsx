@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -13,6 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { THEME_COLORS } from "../lib/site";
+import { OG_IMAGE, SITE_URL } from "../lib/brand";
 
 function NotFoundComponent() {
   return (
@@ -85,6 +87,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Portafolio de Cristian Ramirez, Full-Stack Developer." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: `${SITE_URL}${OG_IMAGE.path}` },
+      { property: "og:image:width", content: String(OG_IMAGE.width) },
+      { property: "og:image:height", content: String(OG_IMAGE.height) },
+      { property: "og:image:alt", content: "Cristian Ramirez — Full-Stack Developer" },
+      { name: "twitter:image", content: `${SITE_URL}${OG_IMAGE.path}` },
+      ...(SITE_URL ? [{ property: "og:url", content: SITE_URL }] : []),
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -105,8 +113,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 const themeScript = `document.documentElement.classList.add('js');try{var t=localStorage.getItem('theme');if(t!=='light')document.documentElement.classList.add('dark')}catch(e){document.documentElement.classList.add('dark')}`;
 
 function RootShell({ children }: { children: ReactNode }) {
+  // Server-render the right <html lang> for ?lang=en links; the client keeps it in sync afterwards.
+  const lang = useRouterState({ select: (s) => (s.location.search as { lang?: string }).lang === "en" ? "en" : "es" });
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />

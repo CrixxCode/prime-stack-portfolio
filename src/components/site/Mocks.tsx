@@ -6,12 +6,12 @@ export function HotelMock({ label }: { label: string }) {
   const booked = new Set([2, 3, 4, 9, 10, 15, 16, 17, 18, 23]);
   return (
     <div className="grid h-full grid-cols-[110px_1fr] overflow-hidden rounded-xl border border-border-strong bg-card text-[10px] shadow-soft" role="img" aria-label={label}>
-      <aside className="space-y-1 border-r border-border bg-surface p-3 font-mono">
+      <div className="space-y-1 border-r border-border bg-surface p-3 font-mono">
         <div className="mb-3 font-sans text-xs font-semibold">Hotel·OS</div>
         {["Dashboard", "Reservas", "Clientes", "Habitaciones", "Facturación", "Reportes"].map((x, i) => (
-          <div key={x} className={`rounded px-2 py-1.5 ${i === 1 ? "bg-primary/15 text-primary" : "text-muted-foreground"}`}>{x}</div>
+          <div key={x} className={`rounded px-2 py-1.5 ${i === 1 ? "bg-primary/8 text-primary" : "text-muted-foreground"}`}>{x}</div>
         ))}
-      </aside>
+      </div>
       <div className="space-y-3 p-4">
         <div className="flex items-center justify-between"><div className="text-sm font-semibold">Reservas · Octubre</div><div className="rounded-md bg-primary px-2 py-1 text-primary-foreground">+ Nueva</div></div>
         <div className="grid grid-cols-3 gap-2">
@@ -24,7 +24,7 @@ export function HotelMock({ label }: { label: string }) {
         </div>
         <div className="space-y-2 rounded-lg border border-border p-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex items-center gap-2"><div className="h-5 w-5 rounded-full bg-surface-2" /><div className="flex-1 space-y-1"><Bar w="60%" /><Bar w="35%" /></div><span className="rounded bg-success/15 px-1.5 py-0.5 font-mono text-success">ok</span></div>
+            <div key={i} className="flex items-center gap-2"><div className="h-5 w-5 rounded-full bg-surface-2" /><div className="flex-1 space-y-1"><Bar w="60%" /><Bar w="35%" /></div><span className="rounded bg-success/15 px-1.5 py-0.5 font-mono text-[oklch(0.48_0.14_155)] dark:text-success">ok</span></div>
           ))}
         </div>
       </div>
