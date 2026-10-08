@@ -57,7 +57,10 @@ function Avatar() {
     dash.slowDown();
   };
   const layer = (k: number) => ({ transform: `translate3d(calc(var(--mx,0) * ${k}px), calc(var(--my,0) * ${k}px), 0)`, transition: "transform 500ms cubic-bezier(.2,.7,.2,1)" });
+  // The graph reads top to bottom as a request through the stack: ui → service → api → logic → auth/models → db.
   const nodes = [[90, 70], [250, 60], [330, 170], [170, 200], [70, 300], [280, 320], [200, 400]] as const;
+  const labels = ["ui", "service", "api", "logic", "auth", "models", "db.postgresql"] as const;
+  const DB = 6;
   const edges = [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [3, 5], [4, 6], [5, 6], [2, 5]] as const;
   return (
     <div ref={ref} onPointerEnter={dash.speedUp} onPointerMove={onMove} onPointerLeave={onLeave} className="relative aspect-[4/5] w-full max-w-md" aria-hidden="true">
@@ -74,27 +77,38 @@ function Avatar() {
         ))}
         {nodes.map(([x, y], i) => (
           <g key={i}>
-            <rect x={x - 5} y={y - 5} width="10" height="10" fill="var(--background)" stroke={i === 3 ? "var(--primary)" : "var(--foreground)"} strokeWidth="1.2" />
-            <text x={x + 9} y={y - 7} fontSize="8" fontFamily="var(--font-mono)" fill="var(--muted-foreground)">{`n${i}·${x},${y}`}</text>
+            {i === DB ? (
+              // Data layer: a small database cylinder instead of a square node
+              <g fill="var(--background)" stroke="var(--foreground)" strokeWidth="1.2">
+                <path d={`M${x - 8} ${y - 6} v12 a8 3 0 0 0 16 0 v-12`} />
+                <ellipse cx={x} cy={y - 6} rx="8" ry="3" />
+              </g>
+            ) : (
+              <rect x={x - 5} y={y - 5} width="10" height="10" fill="var(--background)" stroke={i === 3 ? "var(--primary)" : "var(--foreground)"} strokeWidth="1.2" />
+            )}
+            <text x={x + 12} y={y - 7} fontSize="8" fontFamily="var(--font-mono)" fill="var(--muted-foreground)">{labels[i]}</text>
           </g>
         ))}
         <circle cx="170" cy="200" r="3" fill="var(--primary)" />
       </svg>
-      <div className="absolute left-[-6%] top-[14%] anim-float" style={layer(24)}>
+      {/* Each card sits just below its node: ui/ under "ui" (left), api/ under "api" (right) */}
+      <div className="absolute left-[-6%] top-[22%] anim-float" style={layer(24)}>
+        <div className="rounded-lg border border-border-strong bg-card px-3 py-2 font-mono text-[10px] leading-relaxed shadow-soft">
+          <div className="text-muted-foreground">ui/</div>
+          <div>&lt;ReservationList /&gt;</div>
+          <div><span className="text-muted-foreground">→</span> reservation.service</div>
+          <div><span className="text-muted-foreground">→</span> <span className="text-primary">GET</span> /reservations</div>
+        </div>
+      </div>
+      <div className="absolute right-[-4%] top-[42%] anim-float [animation-delay:-3s]" style={layer(-20)}>
         <div className="rounded-lg border border-border-strong bg-card px-3 py-2 font-mono text-[10px] leading-relaxed shadow-soft">
           <div className="text-muted-foreground">api/</div>
           <div><span className="text-primary">GET</span> /reservations <span className="text-success">200</span></div>
           <div><span className="text-primary">POST</span> /exams <span className="text-success">201</span></div>
         </div>
       </div>
-      <div className="absolute bottom-[12%] right-[-4%] anim-float [animation-delay:-3s]" style={layer(-20)}>
-        <div className="w-40 rounded-lg border border-border-strong bg-card p-3 shadow-soft">
-          <div className="mb-2 flex items-center justify-between font-mono text-[10px] text-muted-foreground"><span>ui.component</span><span className="h-1.5 w-1.5 rounded-full bg-primary" /></div>
-          <div className="space-y-1.5"><div className="h-1.5 w-full rounded bg-surface-2" /><div className="h-1.5 w-3/4 rounded bg-surface-2" /><div className="h-1.5 w-1/2 rounded bg-primary/60" /></div>
-        </div>
-      </div>
       <div className="absolute right-[4%] top-[4%] font-mono text-[10px] text-muted-foreground" style={layer(6)}>11.54°N · 72.91°W</div>
-      <div className="absolute bottom-[3%] left-[5%] font-mono text-[10px] text-muted-foreground" style={layer(6)}>django ⇄ angular</div>
+      <div className="absolute bottom-[3%] left-[5%] font-mono text-[10px] text-muted-foreground" style={layer(6)}>interface ↔ logic ↔ data</div>
     </div>
   );
 }
