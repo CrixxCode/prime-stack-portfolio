@@ -19,9 +19,9 @@ type Project = {
   decision?: { title: string; text: string };
   /** Public links (demo / repository). Private projects simply omit them. */
   links?: { demo: string; repo: string };
-  /** Real screenshots in /public/projects/<name>/ (e.g. { src: "/projects/wayra/dashboard.webp", alt, width, height }).
-   *  While empty, the generated mockup is shown instead. */
-  shots?: { src: string; alt: string; width: number; height: number }[];
+  /** Real screenshots in /public/projects/<name>/ (e.g. { src: "/projects/wayra/dashboard.webp", thumb, alt, width, height }).
+   *  The first one is shown large; with more than one, thumbnails switch between them. While empty, the generated mockup is shown. */
+  shots?: { src: string; thumb: string; alt: string; width: number; height: number }[];
 };
 
 /** A blog article. Add `url` once it is published: only then the card links to it and shows "Read article". */
@@ -90,7 +90,7 @@ const es = {
   ],
   projects: {
     num: "01", label: "Proyectos destacados", title: "Casos de estudio.",
-    problem: "Problema", features: "Funciones clave", stack: "Stack", status: "Estado", mock: "Maqueta de la interfaz",
+    problem: "Problema", features: "Funciones clave", stack: "Stack", status: "Estado", mock: "Maqueta de la interfaz", showShot: "Ver captura",
     context: "Contexto", myRole: "Mi rol", work: "Trabajo técnico",
     origin: "Origen", participation: "Mi participación", concepts: "Conceptos aplicados", decision: "Decisión técnica", demo: "Ver demo", github: "GitHub", newTab: "(se abre en una pestaña nueva)",
     items: [
@@ -100,13 +100,24 @@ const es = {
         origin: "Surgió a partir de un proyecto académico y evolucionó posteriormente como producto SaaS.",
         problem: "Muchos establecimientos gestionan reservas, huéspedes, habitaciones, pagos, inventario y otros procesos mediante información distribuida entre hojas de cálculo, registros físicos y herramientas independientes, dificultando la consistencia, trazabilidad y consulta de los datos.",
         participation: "Desarrollo conjunto del producto como parte de un equipo de dos desarrolladores, participando de forma transversal en levantamiento de requisitos, arquitectura, modelado de datos, backend, frontend, autenticación y autorización, multitenancy, experiencia de usuario, pruebas, documentación y despliegue.",
-        features: ["Reservas y disponibilidad", "Huéspedes y habitaciones", "Facturación, pagos y cargos", "Servicios, paquetes y promociones", "Inventario y egresos", "Reportes y control operativo", "Configuración del establecimiento", "Notificaciones"],
+        features: ["Reservas y disponibilidad", "Huéspedes y habitaciones", "Facturación, pagos y cargos", "Servicios, paquetes y promociones", "Inventario y egresos", "Reportes y control operativo", "Configuración e identidad visual por establecimiento", "Notificaciones"],
         stack: ["Django", "Angular", "PostgreSQL", "Docker"],
         concepts: ["REST", "RBAC", "Multitenancy", "Diseño relacional"],
         decision: { title: "Aislamiento multitenant", text: "La plataforma separa la información por establecimiento para evitar cruces de datos entre organizaciones, complementando esta separación con control de acceso basado en roles y recursos." },
         status: "En fase de pruebas",
         links: WAYRA_LINKS,
-        shots: [],
+        shots: [
+          { src: "/projects/wayra/dashboard.webp", thumb: "/projects/wayra/dashboard-thumb.webp", width: 1440, height: 1000,
+            alt: "Dashboard de Wayra Travel con ocupación, ingresos del día, huéspedes, RevPAR y gráficas de ocupación semanal e ingresos diarios (datos de demostración)." },
+          { src: "/projects/wayra/reservas.webp", thumb: "/projects/wayra/reservas-thumb.webp", width: 1440, height: 1000,
+            alt: "Módulo de reservas de Wayra Travel con indicadores, filtros por estado y tarjetas de reserva con acciones de check-in y check-out (datos de demostración)." },
+          { src: "/projects/wayra/habitaciones.webp", thumb: "/projects/wayra/habitaciones-thumb.webp", width: 1440, height: 1000,
+            alt: "Tablero de habitaciones de Wayra Travel con indicadores de check-ins, salidas, limpieza, mantenimiento y cobros, y filtros por estado y piso (datos de demostración)." },
+          { src: "/projects/wayra/facturacion.webp", thumb: "/projects/wayra/facturacion-thumb.webp", width: 1440, height: 1000,
+            alt: "Detalle de factura en Wayra Travel con cargos de alojamiento y servicios, pagos registrados y saldo pendiente de la estancia (datos de demostración)." },
+          { src: "/projects/wayra/limpieza.webp", thumb: "/projects/wayra/limpieza-thumb.webp", width: 1440, height: 1000,
+            alt: "Módulo de limpieza y mantenimiento de Wayra Travel con tareas por habitación, tareas atrasadas y filtros por estado, tipo y habitación (datos de demostración)." },
+        ],
       },
       {
         name: "Ejercitador Saber Pro", tag: "EdTech · Universidad de La Guajira · Full-Stack",
@@ -275,7 +286,7 @@ const en: typeof es = {
   ],
   projects: {
     num: "01", label: "Featured projects", title: "Case studies.",
-    problem: "Problem", features: "Key features", stack: "Stack", status: "Status", mock: "Interface mockup",
+    problem: "Problem", features: "Key features", stack: "Stack", status: "Status", mock: "Interface mockup", showShot: "Show screenshot",
     context: "Context", myRole: "My role", work: "Technical work",
     origin: "Origin", participation: "My contribution", concepts: "Applied concepts", decision: "Technical decision", demo: "View Demo", github: "GitHub", newTab: "(opens in a new tab)",
     items: [
@@ -285,13 +296,24 @@ const en: typeof es = {
         origin: "Originally developed from an academic project and later evolved into a SaaS product.",
         problem: "Many properties manage bookings, guests, rooms, payments, inventory and other processes with information scattered across spreadsheets, paper records and disconnected tools, which makes data hard to keep consistent, trace and look up.",
         participation: "Built jointly as part of a two-developer team, contributing across requirements gathering, architecture, data modeling, backend, frontend, authentication and authorization, multitenancy, user experience, testing, documentation and deployment.",
-        features: ["Bookings & availability", "Guests & rooms", "Billing, payments & charges", "Services, packages & promotions", "Inventory & expenses", "Reports & operational control", "Property settings", "Notifications"],
+        features: ["Bookings & availability", "Guests & rooms", "Billing, payments & charges", "Services, packages & promotions", "Inventory & expenses", "Reports & operational control", "Per-property settings & branding", "Notifications"],
         stack: ["Django", "Angular", "PostgreSQL", "Docker"],
         concepts: ["REST", "RBAC", "Multitenancy", "Relational design"],
         decision: { title: "Multitenant isolation", text: "The platform separates data by property to prevent information from crossing organizational boundaries, complementing this isolation with role- and resource-based access control." },
         status: "Testing phase",
         links: WAYRA_LINKS,
-        shots: [],
+        shots: [
+          { src: "/projects/wayra/dashboard.webp", thumb: "/projects/wayra/dashboard-thumb.webp", width: 1440, height: 1000,
+            alt: "Wayra Travel dashboard with occupancy, today’s revenue, guests, RevPAR and charts of weekly occupancy and daily revenue (demo data)." },
+          { src: "/projects/wayra/reservas.webp", thumb: "/projects/wayra/reservas-thumb.webp", width: 1440, height: 1000,
+            alt: "Wayra Travel bookings module with summary metrics, status filters and booking cards with check-in and check-out actions (demo data)." },
+          { src: "/projects/wayra/habitaciones.webp", thumb: "/projects/wayra/habitaciones-thumb.webp", width: 1440, height: 1000,
+            alt: "Wayra Travel rooms board with check-in, departure, housekeeping, maintenance and billing indicators, plus status and floor filters (demo data)." },
+          { src: "/projects/wayra/facturacion.webp", thumb: "/projects/wayra/facturacion-thumb.webp", width: 1440, height: 1000,
+            alt: "Wayra Travel invoice detail with lodging and service charges, recorded payments and the stay’s outstanding balance (demo data)." },
+          { src: "/projects/wayra/limpieza.webp", thumb: "/projects/wayra/limpieza-thumb.webp", width: 1440, height: 1000,
+            alt: "Wayra Travel housekeeping and maintenance module with tasks per room, overdue tasks and filters by status, type and room (demo data)." },
+        ],
       },
       {
         name: "Ejercitador Saber Pro", tag: "EdTech · Universidad de La Guajira · Full-Stack",

@@ -66,6 +66,35 @@ export function About() {
   );
 }
 
+type Shot = NonNullable<ReturnType<typeof useSite>["t"]["projects"]["items"][number]["shots"]>[number];
+
+/** Screenshot viewer: the selected one large (at its real proportions, so nothing is cropped on phones),
+ *  thumbnails below to switch when there are several. */
+function Shots({ shots, label }: { shots: Shot[]; label: string }) {
+  const [current, setCurrent] = useState(0);
+  const shot = shots[current] ?? shots[0];
+  if (!shot) return null;
+  return (
+    <div className="mt-5">
+      <img key={shot.src} src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} loading="lazy" decoding="async"
+        className="block h-auto w-full rounded-xl border border-border-strong bg-card" />
+      {shots.length > 1 && (
+        // One row of equal thumbnails spanning the image's full width, whatever their number
+        <ul className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${shots.length}, minmax(0, 1fr))` }}>
+          {shots.map((s, i) => (
+            <li key={s.src}>
+              <button type="button" onClick={() => setCurrent(i)} aria-pressed={i === current} aria-label={`${label} ${i + 1}: ${s.alt}`}
+                className={`block w-full overflow-hidden rounded-md border transition-[border-color,opacity,scale] active:scale-[0.97] ${i === current ? "border-primary" : "border-border-strong opacity-60 hover:opacity-100"}`}>
+                <img src={s.thumb} alt="" width={288} height={200} loading="lazy" decoding="async" className="block h-auto w-full" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export function Projects() {
   const { t } = useSite(); const p = t.projects;
   return (
@@ -82,15 +111,12 @@ export function Projects() {
               <Reveal focus className={`lg:col-span-7 ${i % 2 ? "lg:order-2" : ""} ${extended ? "lg:sticky lg:top-28" : ""}`}>
                 <div className="relative rounded-2xl border border-border bg-surface-2 p-4 md:p-8">
                   <div className="absolute left-4 top-4 font-mono text-[10px] text-muted-foreground md:left-8" aria-hidden="true">fig.0{i + 1}</div>
-                  <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]">
-                    {/* Real screenshots replace the mockup as soon as `shots` has entries (see Project in i18n.ts) */}
-                    {it.shots?.[0] ? (
-                      <img src={it.shots[0].src} alt={it.shots[0].alt} width={it.shots[0].width} height={it.shots[0].height} loading="lazy" decoding="async"
-                        className="h-full w-full rounded-xl border border-border-strong object-cover object-top" />
-                    ) : (
-                      <Mock label={`${p.mock}: ${it.name}`} />
-                    )}
-                  </div>
+                  {/* Real screenshots replace the mockup as soon as `shots` has entries (see Project in i18n.ts) */}
+                  {it.shots?.length ? (
+                    <Shots shots={it.shots} label={p.showShot} />
+                  ) : (
+                    <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]"><Mock label={`${p.mock}: ${it.name}`} /></div>
+                  )}
                 </div>
               </Reveal>
               <div className={`lg:col-span-5 ${i % 2 ? "lg:order-1" : ""}`}>
