@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ArrowDownRight, ArrowRight } from "lucide-react";
+import { ArrowDownRight, ArrowRight, Download } from "lucide-react";
 import { useSite } from "@/lib/site";
 import { CONTACT } from "@/lib/i18n";
 
@@ -145,6 +145,9 @@ export function Hero() {
             </a>
             <a href="#projects" className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-border-strong px-6 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
               {h.cta2}<ArrowDownRight className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+            </a>
+            <a href={t.cv.href} download className="inline-flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <Download className="h-4 w-4" />{t.cv.label}<span className="sr-only"> {t.cv.hint}</span>
             </a>
           </div>
           <p className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground">

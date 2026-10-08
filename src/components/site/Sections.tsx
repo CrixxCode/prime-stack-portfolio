@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getGithubActivity, type GithubActivity } from "@/lib/github-activity";
-import { ArrowRight, ArrowUpRight, Award, ShieldCheck, FolderGit2, Github, Instagram, Linkedin, Lock, Mail, Trophy, Medal, Server, Rocket, Layers } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Award, Download, ShieldCheck, FolderGit2, Github, Instagram, Linkedin, Lock, Mail, Trophy, Medal, Server, Rocket, Layers } from "lucide-react";
 import { Reveal, useSite } from "@/lib/site";
 import { CONTACT } from "@/lib/i18n";
 import { HotelMock, ExamMock } from "./Mocks";
@@ -267,9 +267,8 @@ export function Education() {
         {e.programs.map((pr, i) => (
           <Reveal as="li" key={pr.degree} delay={i * 40} className={`grid gap-4 pb-10 md:grid-cols-12 md:gap-8 ${i > 0 ? "pt-10" : ""}`}>
             <div className="md:col-span-4">
-              {pr.current
-                ? <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{pr.period}</span>
-                : <span className="font-mono text-xs text-muted-foreground">{pr.period}</span>}
+              <div className="font-mono text-xs text-muted-foreground">{pr.period}</div>
+              {pr.current && <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{e.currentL}</span>}
             </div>
             <div className="md:col-span-8">
               <h3 className="text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-none tracking-[-0.035em]">{pr.degree}</h3>
@@ -513,6 +512,11 @@ export function Contact() {
                     </a>
                   </li>
                 ))}
+                <li>
+                  <a href={t.cv.href} download className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
+                    <Download className="h-4 w-4" aria-hidden="true" />{t.cv.label}<span className="sr-only"> {t.cv.hint}</span>
+                  </a>
+                </li>
               </ul>
               <p className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground"><span className="h-2 w-2 rounded-full bg-success" aria-hidden="true" />{c.remote}</p>
             </Reveal>
