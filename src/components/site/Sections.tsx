@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ArrowRight, Award, Clock, Code2, Github, Linkedin, Lock, Mail, Trophy, Medal, Server, Layout, Rocket, Layers } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Award, Clock, ShieldCheck, Code2, Github, Linkedin, Lock, Mail, Trophy, Medal, Server, Layout, Rocket, Layers } from "lucide-react";
 import { Reveal, useSite } from "@/lib/site";
 import { CONTACT } from "@/lib/i18n";
 import { HotelMock, ExamMock } from "./Mocks";
@@ -70,12 +70,24 @@ export function Projects() {
       <div className="container-x">
         <Head num={p.num} label={p.label} title={p.title} />
         <div className="space-y-28 md:space-y-40">
-          {p.items.map((it, i) => { const Mock = i % 2 ? ExamMock : HotelMock; return (
-            <article key={it.name} className="grid min-h-[80vh] items-center gap-10 lg:grid-cols-12 lg:gap-14">
-              <Reveal focus className={`lg:col-span-7 ${i % 2 ? "lg:order-2" : ""}`}>
+          {p.items.map((it, i) => {
+            const Mock = i % 2 ? ExamMock : HotelMock;
+            // Extended case studies are much taller than their visual: top-align and keep the visual in view while reading
+            const extended = Boolean(it.decision);
+            return (
+            <article key={it.name} className={`grid min-h-[80vh] gap-10 lg:grid-cols-12 lg:gap-14 ${extended ? "items-center lg:items-start" : "items-center"}`}>
+              <Reveal focus className={`lg:col-span-7 ${i % 2 ? "lg:order-2" : ""} ${extended ? "lg:sticky lg:top-28" : ""}`}>
                 <div className="relative rounded-2xl border border-border bg-surface-2 p-4 md:p-8">
                   <div className="absolute left-4 top-4 font-mono text-[10px] text-muted-foreground md:left-8" aria-hidden="true">fig.0{i + 1}</div>
-                  <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]"><Mock label={`${p.mock}: ${it.name}`} /></div>
+                  <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]">
+                    {/* Real screenshots replace the mockup as soon as `shots` has entries (see Project in i18n.ts) */}
+                    {it.shots?.[0] ? (
+                      <img src={it.shots[0].src} alt={it.shots[0].alt} width={it.shots[0].width} height={it.shots[0].height} loading="lazy" decoding="async"
+                        className="h-full w-full rounded-xl border border-border-strong object-cover object-top" />
+                    ) : (
+                      <Mock label={`${p.mock}: ${it.name}`} />
+                    )}
+                  </div>
                 </div>
               </Reveal>
               <div className={`lg:col-span-5 ${i % 2 ? "lg:order-1" : ""}`}>
@@ -84,20 +96,42 @@ export function Projects() {
                 <Reveal delay={60}><p className="mt-4 text-lg text-muted-foreground">{it.desc}</p></Reveal>
                 <Reveal delay={90}>
                   <dl className="mt-8 divide-y divide-border border-y border-border text-sm">
-                    {[[p.problem, it.problem], [p.role, it.role]].map(([k, v]) => (
+                    {([[p.origin, it.origin], [p.problem, it.problem], [p.role, it.role], [p.participation, it.participation]] as const).map(([k, v]) => v && (
                       <div key={k} className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{k}</dt><dd>{v}</dd></div>
                     ))}
                     <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.features}</dt>
                       <dd><ul className="grid gap-1 sm:grid-cols-2">{it.features.map((f) => <li key={f} className="flex gap-2"><span className="text-primary" aria-hidden="true">→</span>{f}</li>)}</ul></dd></div>
                     <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.stack}</dt><dd className="flex flex-wrap gap-1.5">{it.stack.map((s) => <Tag key={s}>{s}</Tag>)}</dd></div>
+                    {/* Concepts are ideas, not tools: plain text instead of the stack's tags */}
+                    {it.concepts && <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.concepts}</dt><dd className="text-muted-foreground">{it.concepts.join(" · ")}</dd></div>}
                     <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.status}</dt><dd className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{it.status}</dd></div>
-                    <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.repo}</dt><dd className="flex items-center gap-2 text-muted-foreground"><Lock className="h-3.5 w-3.5" />{p.private}</dd></div>
+                    {!it.links && <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.repo}</dt><dd className="flex items-center gap-2 text-muted-foreground"><Lock className="h-3.5 w-3.5" />{p.private}</dd></div>}
                   </dl>
                 </Reveal>
+                {it.decision && (
+                  <Reveal delay={105}>
+                    <div className="mt-6 rounded-xl border border-border bg-card p-5">
+                      <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground"><ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />{p.decision}</div>
+                      <h4 className="mt-2 text-base font-semibold">{it.decision.title}</h4>
+                      <p className="mt-1.5 text-sm text-muted-foreground">{it.decision.text}</p>
+                    </div>
+                  </Reveal>
+                )}
                 <Reveal delay={120}>
-                  <p className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-border-strong px-5 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />{p.soon}
-                  </p>
+                  {it.links ? (
+                    <div className="mt-8 flex flex-wrap gap-3">
+                      <a href={it.links.demo} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">
+                        {p.demo}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {it.name} {p.newTab}</span>
+                      </a>
+                      <a href={it.links.repo} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-5 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
+                        <Github className="h-4 w-4" aria-hidden="true" />{p.github}<span className="sr-only">: {it.name} {p.newTab}</span>
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-border-strong px-5 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4" />{p.soon}
+                    </p>
+                  )}
                 </Reveal>
               </div>
             </article>); })}

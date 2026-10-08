@@ -1,5 +1,25 @@
 export type Lang = "es" | "en";
 
+/** A featured project. Optional fields render only when present, so each project shows what it has. */
+type Project = {
+  name: string; tag: string; desc: string; problem: string; features: string[]; stack: string[]; status: string;
+  role?: string;
+  /** Used instead of `role` for team projects. */
+  participation?: string;
+  origin?: string;
+  /** Engineering concepts (not technologies); shown apart from the stack. */
+  concepts?: string[];
+  /** A key technical decision, highlighted on its own. */
+  decision?: { title: string; text: string };
+  /** Public links; without them the card shows the private-repo row and the "coming soon" note. */
+  links?: { demo: string; repo: string };
+  /** Real screenshots in /public/projects/<name>/ (e.g. { src: "/projects/wayra/dashboard.webp", alt, width, height }).
+   *  While empty, the generated mockup is shown instead. */
+  shots?: { src: string; alt: string; width: number; height: number }[];
+};
+
+const WAYRA_LINKS = { demo: "https://wayra-travel.com/", repo: "https://github.com/CrixxCode/wayra-gh" };
+
 const es = {
   nav: { home: "Inicio", about: "Sobre mí", experience: "Experiencia", projects: "Proyectos", stack: "Stack", education: "Formación", github: "GitHub", contact: "Contacto", cta: "Hablemos", menu: "Menú", close: "Cerrar", label: "Principal", skip: "Saltar al contenido", switchLang: "Cambiar idioma a inglés", toLight: "Cambiar a modo claro", toDark: "Cambiar a modo oscuro" },
   hero: {
@@ -26,10 +46,24 @@ const es = {
   projects: {
     num: "01", label: "Proyectos destacados", title: "Casos de estudio.",
     problem: "Problema", role: "Rol", features: "Funciones clave", stack: "Stack", status: "Estado", repo: "Repositorio", private: "Privado / no público", cta: "Ver caso de estudio", soon: "Caso de estudio próximamente", mock: "Maqueta de la interfaz",
+    origin: "Origen", participation: "Mi participación", concepts: "Conceptos aplicados", decision: "Decisión técnica", demo: "Ver demo", github: "GitHub", newTab: "(se abre en una pestaña nueva)",
     items: [
-      { name: "Plataforma de gestión hotelera", tag: "Riohacha · Académico", desc: "Plataforma web full-stack para centralizar la información operativa de hoteles en Riohacha.", problem: "La gestión de reservas, clientes y habitaciones dispersa en hojas de cálculo genera errores y poca visibilidad.", role: "Desarrollo full-stack: modelado de datos, API y frontend.", features: ["Reservas y disponibilidad", "Clientes y habitaciones", "Facturación (concepto)", "Reportes operativos"], stack: ["Django", "Angular", "PostgreSQL"], status: "Caso académico / producto" },
+      {
+        name: "Wayra Travel", tag: "SaaS · Hospitality Tech · Full-Stack",
+        desc: "SaaS multitenant para centralizar y gestionar la operación de establecimientos de alojamiento desde una única plataforma.",
+        origin: "Surgió a partir de un proyecto académico y evolucionó posteriormente como producto SaaS.",
+        problem: "Muchos establecimientos gestionan reservas, huéspedes, habitaciones, pagos, inventario y otros procesos mediante información distribuida entre hojas de cálculo, registros físicos y herramientas independientes, dificultando la consistencia, trazabilidad y consulta de los datos.",
+        participation: "Desarrollo conjunto del producto como parte de un equipo de dos desarrolladores, participando de forma transversal en levantamiento de requisitos, arquitectura, modelado de datos, backend, frontend, autenticación y autorización, multitenancy, experiencia de usuario, pruebas, documentación y despliegue.",
+        features: ["Reservas y disponibilidad", "Huéspedes y habitaciones", "Facturación, pagos y cargos", "Servicios, paquetes y promociones", "Inventario y egresos", "Reportes y control operativo", "Configuración del establecimiento", "Notificaciones"],
+        stack: ["Django", "Angular", "PostgreSQL", "Docker"],
+        concepts: ["REST", "RBAC", "Multitenancy", "Diseño relacional"],
+        decision: { title: "Aislamiento multitenant", text: "La plataforma separa la información por establecimiento para evitar cruces de datos entre organizaciones, complementando esta separación con control de acceso basado en roles y recursos." },
+        status: "En fase de pruebas",
+        links: WAYRA_LINKS,
+        shots: [],
+      },
       { name: "UniguajiraTest", tag: "EdTech · Saber Pro", desc: "Plataforma de preparación y evaluación para las pruebas Saber Pro.", problem: "Los estudiantes carecen de un entorno estructurado para diagnosticar y entrenar sus competencias antes del examen.", role: "Desarrollo full-stack y diseño de la experiencia.", features: ["Práctica y diagnóstico", "Entrenamiento por competencias", "Simulacros", "Retroalimentación y analítica"], stack: ["Django", "Angular", "PostgreSQL"], status: "En desarrollo" },
-    ],
+    ] as Project[],
   },
   stack: {
     num: "03", label: "Stack", title: "Organizado por dominio.",
@@ -107,10 +141,24 @@ const en: typeof es = {
   projects: {
     num: "01", label: "Featured projects", title: "Case studies.",
     problem: "Problem", role: "Role", features: "Key features", stack: "Stack", status: "Status", repo: "Repository", private: "Private / not public", cta: "View Case Study", soon: "Case study coming soon", mock: "Interface mockup",
+    origin: "Origin", participation: "My contribution", concepts: "Applied concepts", decision: "Technical decision", demo: "View demo", github: "GitHub", newTab: "(opens in a new tab)",
     items: [
-      { name: "Hotel management platform", tag: "Riohacha · Academic", desc: "Full-stack web platform to centralize hotel operations data in Riohacha.", problem: "Reservations, clients and rooms scattered across spreadsheets cause errors and poor visibility.", role: "Full-stack development: data modeling, API and frontend.", features: ["Reservations & availability", "Clients & rooms", "Billing (concept)", "Operational reports"], stack: ["Django", "Angular", "PostgreSQL"], status: "Academic / product case" },
+      {
+        name: "Wayra Travel", tag: "SaaS · Hospitality Tech · Full-Stack",
+        desc: "Multitenant SaaS for centralizing and managing lodging operations from a single platform.",
+        origin: "Originally developed from an academic project and later evolved into a SaaS product.",
+        problem: "Many properties manage bookings, guests, rooms, payments, inventory and other processes with information scattered across spreadsheets, paper records and disconnected tools, which makes data hard to keep consistent, trace and look up.",
+        participation: "Built jointly as part of a two-developer team, contributing across requirements gathering, architecture, data modeling, backend, frontend, authentication and authorization, multitenancy, user experience, testing, documentation and deployment.",
+        features: ["Bookings & availability", "Guests & rooms", "Billing, payments & charges", "Services, packages & promotions", "Inventory & expenses", "Reports & operational control", "Property settings", "Notifications"],
+        stack: ["Django", "Angular", "PostgreSQL", "Docker"],
+        concepts: ["REST", "RBAC", "Multitenancy", "Relational design"],
+        decision: { title: "Multitenant isolation", text: "The platform separates data by property to prevent information from crossing organizational boundaries, complementing this isolation with role- and resource-based access control." },
+        status: "Testing phase",
+        links: WAYRA_LINKS,
+        shots: [],
+      },
       { name: "UniguajiraTest", tag: "EdTech · Saber Pro", desc: "Preparation and assessment platform for the Saber Pro exams.", problem: "Students lack a structured environment to diagnose and train their skills before the exam.", role: "Full-stack development and experience design.", features: ["Practice & diagnosis", "Skill-based training", "Mock exams", "Feedback & analytics"], stack: ["Django", "Angular", "PostgreSQL"], status: "In development" },
-    ],
+    ] as Project[],
   },
   stack: {
     num: "03", label: "Stack", title: "Organized by domain.",
