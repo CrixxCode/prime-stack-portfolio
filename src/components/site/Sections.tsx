@@ -313,7 +313,7 @@ function ActivityMap({ days, label }: { days: GithubActivity["days"]; label: str
 export function GitHubPanel() {
   const { t, lang } = useSite(); const g = t.github;
   // Fetched after the page renders (the section is far below the fold); hidden if GitHub can't be reached
-  const { data: activity } = useQuery({ queryKey: ["github-activity"], queryFn: () => getGithubActivity(), staleTime: Infinity, retry: false });
+  const { data: activity, isPending } = useQuery({ queryKey: ["github-activity"], queryFn: () => getGithubActivity(), staleTime: Infinity, retry: false });
   const fmt = new Intl.NumberFormat(lang);
   return (
     <section id="github" className="flex min-h-dvh items-center bg-surface/40 py-24 md:py-36">
@@ -325,6 +325,17 @@ export function GitHubPanel() {
             <Github className="h-4 w-4" aria-hidden="true" />{g.profileCta}<span className="sr-only">: {CONTACT.githubUser} {g.newTab}</span>
           </a>
         </Reveal>
+        {/* Same footprint as the activity card while it loads, so the repositories below don't jump */}
+        {isPending && (
+          <div aria-hidden="true" className="mb-4 rounded-2xl border border-border bg-card p-6 md:p-8">
+            <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+              <div className="h-3 w-40 rounded bg-surface-2" />
+              <div className="h-14 w-48 rounded bg-surface-2" />
+            </div>
+            <div className="mt-6 aspect-[686/88] w-full rounded bg-surface-2" />
+            <div className="mt-4 h-4" />
+          </div>
+        )}
         {activity && (
           // data-source: lets you check in DevTools whether the GITHUB_TOKEN secret is being used
           <div data-source={activity.source} className="mb-4 rounded-2xl border border-border bg-card p-6 md:p-8">
@@ -375,12 +386,12 @@ export function Services() {
   const { t } = useSite(); const s = t.services;
   const icons = [Layers, Server, Rocket];
   return (
-    <section className="container-x py-24 md:py-32">
+    <section id="services" className="container-x py-24 md:py-32">
       <Head num={s.num} label={s.label} labelIsHeading />
       <ul className="divide-y divide-border border-y border-border">
         {s.items.map((x, i) => { const I = icons[i] ?? Layers; return (
-          <Reveal as="li" key={x.t} delay={i * 30} className="group grid grid-cols-[auto_1fr] items-center gap-5 py-6 md:grid-cols-[60px_1fr_1fr] md:py-8">
-            <I className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" aria-hidden="true" />
+          <Reveal as="li" key={x.t} delay={i * 30} className="grid grid-cols-[auto_1fr] items-center gap-5 py-6 md:grid-cols-[60px_1fr_1fr] md:py-8">
+            <I className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             <h3 className="text-xl font-semibold tracking-tight md:text-3xl">{x.t}</h3>
             <p className="col-span-2 text-muted-foreground md:col-span-1">{x.d}</p>
           </Reveal>); })}
@@ -397,7 +408,7 @@ export function Services() {
 export function Blog() {
   const { t } = useSite(); const b = t.blog;
   return (
-    <section className="border-t border-border py-24 md:py-32">
+    <section id="blog" className="border-t border-border py-24 md:py-32">
       <div className="container-x">
         <Head num={b.num} label={b.label} title={b.title} />
         <Reveal><p className="-mt-4 mb-10 max-w-2xl text-lg text-muted-foreground md:-mt-8">{b.intro}</p></Reveal>
@@ -440,7 +451,7 @@ export function Contact() {
     setErrs(n); setOk(false);
     if (Object.keys(n).length) { (e.currentTarget.querySelector(`[name=${Object.keys(n)[0]}]`) as HTMLElement)?.focus(); return; }
     setOk(true);
-    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Portfolio — " + name)}&body=${encodeURIComponent(msg + "\n\n" + email)}`;
+    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(`${c.subject} — ${name}`)}&body=${encodeURIComponent(msg + "\n\n" + email)}`;
   };
   const field = "mt-2 block w-full rounded-lg border border-input bg-background px-4 py-3 text-[15px] transition-colors placeholder:text-muted-foreground focus:border-primary aria-[invalid=true]:border-destructive";
   const socials = [
@@ -483,7 +494,7 @@ export function Contact() {
                   {errs[k] && <p id={`e-${k}`} className="mt-1.5 text-sm text-destructive">{errs[k]}</p>}
                 </div>
               ))}
-              <button type="submit" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-foreground text-sm font-medium text-background transition-transform active:scale-[0.97]">{c.send}<ArrowRight className="h-4 w-4" /></button>
+              <button type="submit" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-foreground text-sm font-medium text-background transition-[opacity,scale] hover:opacity-90 active:scale-[0.97]">{c.send}<ArrowRight className="h-4 w-4" /></button>
               <p role="status" aria-live="polite" className="text-sm text-muted-foreground">{ok && <>{c.ok} {c.okFallback} <a href={`mailto:${CONTACT.email}`} className="underline underline-offset-2">{CONTACT.email}</a>.</>}</p>
             </form>
           </Reveal>

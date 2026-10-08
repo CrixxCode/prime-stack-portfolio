@@ -2,7 +2,8 @@ import { useSite } from "@/lib/site";
 import { BRAND } from "@/lib/brand";
 
 // Both theme variants are rendered and CSS shows the right one, so switching theme is instant
-// and there's no flash before hydration. loading="lazy" keeps the hidden variant from downloading.
+// and there's no flash before hydration. The small nav mark loads eagerly (it's above the fold and the
+// theme isn't known on the server); the large horizontal logo is lazy, so its hidden variant never downloads.
 
 /** Brand mark in the theme's variant, or a dashed placeholder until set. Decorative: the parent provides the name. */
 export function BrandLogo({ className = "h-9 w-9" }: { className?: string }) {
@@ -11,8 +12,8 @@ export function BrandLogo({ className = "h-9 w-9" }: { className?: string }) {
   if (light && dark)
     return (
       <span className={`${className} grid shrink-0 place-items-center`}>
-        <img src={light} alt="" width={width} height={height} loading="lazy" className="h-[78%] w-auto dark:hidden" />
-        <img src={dark} alt="" width={width} height={height} loading="lazy" className="hidden h-[78%] w-auto dark:block" />
+        <img src={light} alt="" width={width} height={height} className="h-[78%] w-auto dark:hidden" />
+        <img src={dark} alt="" width={width} height={height} className="hidden h-[78%] w-auto dark:block" />
       </span>
     );
   return (

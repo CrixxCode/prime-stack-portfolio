@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type ElementType } from "react";
 import { dict, type Dict, type Lang } from "./i18n";
+import { saveLang } from "./prefs";
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: Dict; theme: "light" | "dark"; toggleTheme: () => void };
 const SiteCtx = createContext<Ctx | null>(null);
@@ -9,26 +10,20 @@ export const THEME_COLORS = { light: "#faf9f6", dark: "#0a0a0b" } as const;
 const syncThemeColor = (theme: "light" | "dark") =>
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[theme]);
 
-// `initialLang` comes from ?lang= in the URL: it wins over the stored or browser language,
-// and the server renders that language directly (no flash).
-export function SiteProvider({ children, initialLang }: { children: ReactNode; initialLang?: Lang | undefined }) {
-  const [lang, setLangS] = useState<Lang>(initialLang ?? "es");
+// `initialLang` is ?lang= from the URL or, without it, the saved/browser language detected on the
+// server (lib/prefs.ts), so the first render is already in the right language (no flash).
+export function SiteProvider({ children, initialLang }: { children: ReactNode; initialLang: Lang }) {
+  const [lang, setLangS] = useState<Lang>(initialLang);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   useEffect(() => {
     const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
     setTheme(current);
     syncThemeColor(current);
-    if (initialLang) return;
-    let l: string | null = null;
-    try { l = localStorage.getItem("lang"); } catch { /* storage unavailable */ }
-    if (l === "en" || l === "es") setLangS(l);
-    else if (!navigator.languages.some((x) => x.toLowerCase().startsWith("es")) && navigator.languages.some((x) => x.toLowerCase().startsWith("en"))) setLangS("en");
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- initial values only
   }, []);
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
   const setLang = (l: Lang) => {
     setLangS(l);
-    try { localStorage.setItem("lang", l); } catch { /* storage unavailable */ }
+    saveLang(l);
     // Keep the address shareable: it always says which language is showing.
     const url = new URL(window.location.href);
     url.searchParams.set("lang", l);

@@ -53,8 +53,9 @@ export function Nav() {
       </button>
       <button type="button" onClick={toggleTheme} aria-label={theme === "dark" ? t.nav.toLight : t.nav.toDark}
         className="relative after:absolute after:-inset-x-0.5 after:-inset-y-1 grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-[color,background-color,scale] hover:bg-surface-2 hover:text-foreground active:scale-[0.97]">
-        <Sun className="icon-swap h-4 w-4" data-off={theme !== "dark"} />
-        <Moon className="icon-swap h-4 w-4" data-off={theme === "dark"} />
+        {/* Which icon shows follows the html.dark class (set before first paint), not React state: no wrong icon while loading */}
+        <Sun className="icon-swap theme-sun h-4 w-4" />
+        <Moon className="icon-swap theme-moon h-4 w-4" />
       </button>
     </div>
   );

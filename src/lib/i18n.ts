@@ -230,12 +230,19 @@ const es = {
   },
   contact: {
     num: "09", label: "Contacto", title: "Construyamos algo juntos.", text: "Estoy disponible para proyectos, colaboraciones y oportunidades donde pueda aportar desde el desarrollo Full-Stack y seguir creciendo como ingeniero de software.",
-    remote: "Disponible para trabajo remoto", newTab: "(se abre en una pestaña nueva)",
+    remote: "Disponible para trabajo remoto", subject: "Portafolio", newTab: "(se abre en una pestaña nueva)",
     name: "Nombre", email: "Email", message: "Mensaje", send: "Enviar mensaje",
     errName: "Escribe tu nombre.", errEmail: "Escribe un email válido.", errMsg: "El mensaje debe tener al menos 10 caracteres.", ok: "Se abrirá tu cliente de correo para completar el envío.", okFallback: "¿No se abrió? Escríbeme directamente a",
   },
   footer: { tagline: "Diseñado y construido con intención.", newTab: "(se abre en una pestaña nueva)" },
   brand: { logo: "Logo", banner: "Banner de marca", bannerAlt: "Logotipo de Cristian Ramirez, Full-Stack Developer" },
+  // Text inside the illustrative project mockups (Mocks.tsx)
+  mocks: {
+    hotelNav: ["Dashboard", "Reservas", "Clientes", "Habitaciones", "Facturación", "Reportes"], hotelTitle: "Reservas · Octubre", hotelNew: "+ Nueva",
+    hotelKpis: ["Ocupación", "Check-ins", "Habitaciones"],
+    examSession: "simulacro · 24/35", examQuestion: "Lectura crítica · P24", examDiagnosis: "Diagnóstico", examAreas: ["LC", "RC", "CC", "IN", "CE"],
+  },
+  errors: { notFound: "Página no encontrada", notFoundText: "La página que buscas no existe o se movió.", failed: "Esta página no cargó", failedText: "Algo falló de nuestro lado. Intenta de nuevo o vuelve al inicio.", retry: "Intentar de nuevo", home: "Volver al inicio" },
 };
 
 const en: typeof es = {
@@ -265,7 +272,7 @@ const en: typeof es = {
     num: "01", label: "Featured projects", title: "Case studies.",
     problem: "Problem", features: "Key features", stack: "Stack", status: "Status", mock: "Interface mockup",
     context: "Context", myRole: "My role", work: "Technical work",
-    origin: "Origin", participation: "My contribution", concepts: "Applied concepts", decision: "Technical decision", demo: "View demo", github: "GitHub", newTab: "(opens in a new tab)",
+    origin: "Origin", participation: "My contribution", concepts: "Applied concepts", decision: "Technical decision", demo: "View Demo", github: "GitHub", newTab: "(opens in a new tab)",
     items: [
       {
         name: "Wayra Travel", tag: "SaaS · Hospitality Tech · Full-Stack",
@@ -369,7 +376,7 @@ const en: typeof es = {
   github: {
     num: "06", label: "GitHub", title: "Code that also tells the story.",
     intro: "I keep public repositories for personal projects, academic work and technical exercises that document part of my work and growth as a developer.",
-    cta: "View repository", profileCta: "View GitHub profile", newTab: "(opens in a new tab)",
+    cta: "View Repository", profileCta: "View GitHub Profile", newTab: "(opens in a new tab)",
     activityTitle: "Activity in the last year", contributionsL: "contributions", reposL: "public repositories", less: "Less", more: "More", source: "Public GitHub data · refreshed daily",
     repos: [
       { name: "Wayra Travel", type: "SaaS product", featured: true, url: "https://github.com/CrixxCode/wayra-gh",
@@ -383,7 +390,7 @@ const en: typeof es = {
         stack: ["ASP.NET Core", "Angular", "SQL Server", "Docker"], extra: ["Testing", "GitHub Actions"] },
     ] as Repo[],
   },
-  services: { num: "07", label: "How I can contribute", cta: "Let’s talk about your project", items: [
+  services: { num: "07", label: "How I can contribute", cta: "Let’s Talk About Your Project", items: [
     { t: "Full-Stack Development", d: "Building and evolving web applications, contributing from requirements and technical design through frontend, backend and testing." },
     { t: "Technical analysis & support", d: "Support with requirements analysis, data modeling, API design, technical reviews and improvements to existing solutions." },
     { t: "Product collaboration", d: "Joining existing teams and products to implement features, perform QA, resolve issues and support the product’s continued technical evolution." },
@@ -391,7 +398,7 @@ const en: typeof es = {
   blog: {
     num: "08", label: "Blog", title: "Notes on what I build and learn.",
     intro: "A space to document technical decisions, architecture, data and lessons learned while building real products and projects.",
-    read: "Read article", newTab: "(opens in a new tab)",
+    read: "Read Article", newTab: "(opens in a new tab)",
     posts: [
       {
         title: "Architecture, Data Model and Functional Design of a Web Platform for Hotel Information Management in Riohacha",
@@ -403,12 +410,18 @@ const en: typeof es = {
   },
   contact: {
     num: "09", label: "Contact", title: "Let’s build something together.", text: "I’m available for projects, collaborations and opportunities where I can contribute as a Full-Stack Developer while continuing to grow as a software engineer.",
-    remote: "Available for remote work", newTab: "(opens in a new tab)",
-    name: "Name", email: "Email", message: "Message", send: "Send message",
+    remote: "Available for remote work", subject: "Portfolio", newTab: "(opens in a new tab)",
+    name: "Name", email: "Email", message: "Message", send: "Send Message",
     errName: "Please enter your name.", errEmail: "Please enter a valid email.", errMsg: "Message must be at least 10 characters.", ok: "Your email client will open so you can complete the message.", okFallback: "Didn’t open? Email me directly at",
   },
   footer: { tagline: "Designed and built with intention.", newTab: "(opens in a new tab)" },
   brand: { logo: "Logo", banner: "Brand banner", bannerAlt: "Cristian Ramirez, Full-Stack Developer logo" },
+  mocks: {
+    hotelNav: ["Dashboard", "Bookings", "Guests", "Rooms", "Billing", "Reports"], hotelTitle: "Bookings · October", hotelNew: "+ New",
+    hotelKpis: ["Occupancy", "Check-ins", "Rooms"],
+    examSession: "practice test · 24/35", examQuestion: "Critical reading · Q24", examDiagnosis: "Diagnostics", examAreas: ["CR", "QR", "CC", "EN", "WC"],
+  },
+  errors: { notFound: "Page not found", notFoundText: "The page you’re looking for doesn’t exist or has moved.", failed: "This page didn’t load", failedText: "Something went wrong on our side. Try again or go back home.", retry: "Try Again", home: "Back to Home" },
 };
 
 export const dict = { es, en };

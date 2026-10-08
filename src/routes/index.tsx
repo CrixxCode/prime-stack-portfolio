@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import { SiteProvider } from "@/lib/site";
 import type { Lang } from "@/lib/i18n";
 import { Nav } from "@/components/site/Nav";
@@ -18,8 +18,9 @@ export const Route = createFileRoute("/")({
     const lang = search["lang"];
     return lang === "en" || lang === "es" ? { lang } : {};
   },
-  head: ({ match }) => {
-    const description = descriptions[match.search.lang ?? "es"];
+  head: ({ match, matches }) => {
+    const detected = (matches[0]?.loaderData as { lang?: Lang } | undefined)?.lang;
+    const description = descriptions[match.search.lang ?? detected ?? "es"];
     return {
     meta: [
       { title },
@@ -34,10 +35,13 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const rootApi = getRouteApi("__root__");
+
 function Index() {
   const { lang } = Route.useSearch();
+  const detected = rootApi.useLoaderData().lang;
   return (
-    <SiteProvider initialLang={lang}>
+    <SiteProvider initialLang={lang ?? detected}>
       <Nav />
       <main id="main">
         <Hero />
