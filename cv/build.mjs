@@ -7,6 +7,7 @@ import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { CONTACT, dict } from "../src/lib/i18n.ts";
+import { SITE_URL } from "../src/lib/brand.ts";
 
 const CHROME = process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const OUT_DIR = resolve("public/cv");
@@ -142,7 +143,7 @@ function render(lang) {
   h1 { font-size: 24pt; font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
   .role { font-family: "Geist Mono", monospace; font-size: 9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); margin-top: 5pt; }
   .contact { margin-top: 7pt; font-size: 8.6pt; color: var(--muted); }
-  .contact a { color: var(--fg); }
+  .contact a { color: var(--fg); white-space: nowrap; }
   .contact.remote { margin-top: 2pt; }
   a { color: var(--primary); text-decoration: none; }
   section { margin-bottom: 9pt; }
@@ -175,7 +176,7 @@ function render(lang) {
       <h1>${esc(CONTACT.name)}</h1>
       <p class="role">${esc(t.hero.label)}</p>
       <p class="contact"><a href="mailto:${CONTACT.email}">${CONTACT.email}</a> · <a href="${CONTACT.linkedin}">linkedin.com/in/cristian-daniel-ramirez-vega</a> · <a href="${CONTACT.github}">${bare(CONTACT.github)}</a></p>
-      <p class="contact remote">${esc(t.contact.remote)}</p>
+      <p class="contact remote"><a href="${SITE_URL}">${bare(SITE_URL)}</a> · ${esc(t.contact.remote)}</p>
     </header>
     ${section(h.profile, `<p>${esc(x.profile)}</p>`)}
     ${section(h.experience, jobs)}

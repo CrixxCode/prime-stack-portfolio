@@ -1,6 +1,7 @@
 import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import { SiteProvider } from "@/lib/site";
 import type { Lang } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/brand";
 import { Nav } from "@/components/site/Nav";
 import { Hero } from "@/components/site/Hero";
 import { BrandBanner } from "@/components/site/Brand";
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/")({
   head: ({ match, matches }) => {
     const detected = (matches[0]?.loaderData as { lang?: Lang } | undefined)?.lang;
     const description = descriptions[match.search.lang ?? detected ?? "es"];
+    // Canonical URL per language version (?lang=), plus hreflang alternates so search engines pair them
+    const url = match.search.lang ? `${SITE_URL}/?lang=${match.search.lang}` : `${SITE_URL}/`;
     return {
     meta: [
       { title },
@@ -29,6 +32,13 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: url },
+    ],
+    links: [
+      { rel: "canonical", href: url },
+      { rel: "alternate", hrefLang: "es", href: `${SITE_URL}/?lang=es` },
+      { rel: "alternate", hrefLang: "en", href: `${SITE_URL}/?lang=en` },
+      { rel: "alternate", hrefLang: "x-default", href: `${SITE_URL}/` },
     ],
     };
   },

@@ -106,7 +106,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:height", content: String(OG_IMAGE.height) },
       { property: "og:image:alt", content: "Cristian Ramirez — Full-Stack Developer" },
       { name: "twitter:image", content: `${SITE_URL}${OG_IMAGE.path}` },
-      ...(SITE_URL ? [{ property: "og:url", content: SITE_URL }] : []),
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
