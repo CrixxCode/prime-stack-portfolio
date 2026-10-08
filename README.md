@@ -11,20 +11,23 @@ IDENTITY
 PROFILE CONTENT
 - Role: Full-Stack Developer.
 - Main strengths: Django + Angular.
-- Also works with/has experience with: Python, ASP.NET Core, .NET, React, Node.js, TypeScript, JavaScript, PostgreSQL, MySQL, SQL Server, Docker, Git, Postman, WSL.
-- Message: preferred technologies exist, but value comes from fundamentals and ability to adapt fast to new stacks.
-- Education: Ingeniería de Sistemas, Universidad de La Guajira, final stage of degree.
-- Interests: software architecture, web development, software engineering, AI.
-- English level: B2.
-- Experience: Full-Stack developer at ALGORITHM S.A.S., June 1, 2026 – Present. Keep company work descriptions generic and do not expose private/internal projects.
-- Achievements: strong Saber Pro performance, winner of a university hackathon, top 10 in a national hackathon.
+- Also works with/has experience with: Python, ASP.NET Core / .NET, C#, React, Node.js, Java, TypeScript, JavaScript, PostgreSQL, MySQL, SQL Server, Docker, Git, Postman, WSL, Railway.
+- Primary stack: Django + Angular. Current professional work: ASP.NET Core / .NET + React.
+- Message: takes part in the whole product cycle (problem, requirements, architecture, data, backend, frontend, UX, testing); value comes from transferable fundamentals; growing interest in software architecture (not presented as an architect).
+- Education: Ingeniería de Sistemas, Universidad de La Guajira — in progress, tenth semester, expected graduation first half of 2027. Technical training: Técnico en Sistemas, SENA.
+- Interests: software architecture, software engineering, digital product development, AI.
+- English level: B2 (based on Saber Pro results; not an international certification).
+- Experience:
+  - ALGORITHM S.A.S. — Full-Stack Developer Jr., June 2026 – Present (ASP.NET Core / .NET + React). Client work stays anonymous: no client or product names.
+  - Universidad de La Guajira, Vicerrectoría de Docencia — Desarrollador Full-Stack Jr., September 2026 – Present, working on Ejercitador Saber Pro (joined an existing codebase: QA, testing, bug fixing, refactoring).
+- Achievements: 1st place, Maratón de Programación 2023 (Systems Engineering program, Universidad de La Guajira — not a hackathon); Hackathon Colombia 5.0, Bogotá 2026, national Top 10; Saber Pro overall score 188 (citizenship 204, critical reading 200, quantitative reasoning 186, English 181, written communication 168).
 - Do not invent years of experience, certificates, repository counts, contribution counts, or other stats not given.
 
 PROJECTS
-Use two public-safe featured projects:
-1) Academic hotel management platform for Riohacha — full-stack web platform for hotel information management, reservations, clients, rooms, billing/reporting concepts; position as academic/product case study.
-2) UniguajiraTest — Saber Pro preparation/evaluation platform with practice, diagnosis, training, mock exams, feedback and analytics.
-Do not use any private company repository. Repo links should remain hidden or shown as “Private / not public” unless a real URL is supplied later.
+Two featured projects:
+1) Wayra Travel — multitenant SaaS for lodging operations (SaaS · Hospitality Tech · Full-Stack). Started as an academic project and later evolved into a SaaS product; built by a two-developer team. Stack: Django, Angular, PostgreSQL, Docker. Status: testing phase. Demo: https://wayra-travel.com/ · Repo: https://github.com/CrixxCode/wayra-gh
+2) Ejercitador Saber Pro — institutional platform of the Vicerrectoría de Docencia, Universidad de La Guajira, for Saber Pro competencies. Joined an existing project (QA, testing, bug fixing, refactoring). Stack: Django, FastAPI, React, MySQL. Status: in development. Private repository: no link.
+Do not expose any private company repository or client details.
 
 VISUAL SYSTEM
 Create both Light and Dark modes as intentionally designed variants.
@@ -52,7 +55,7 @@ LAYOUT
 
 NAVBAR
 Floating centered pill navbar, sticky, compact, subtle blur and border, translucent background.
-Items: Inicio, Sobre mí, Experiencia, Proyectos, Stack, Formación, Logros, GitHub, Contacto.
+Items (desktop, same order as the page): Inicio, Proyectos, Experiencia, Sobre mí, Stack, Contacto. The mobile menu also lists Formación and GitHub.
 Include ES/EN and Light/Dark controls.
 On mobile use an elegant compact menu, preserving clear CTA access.
 
@@ -117,37 +120,36 @@ Tech tags can include .NET, React, APIs, databases if appropriate.
 EDUCATION
 Ingeniería de Sistemas
 Universidad de La Guajira
-Estado: etapa final / décimo semestre
-Interests: Arquitectura de software, Desarrollo web, Ingeniería de software, Inteligencia Artificial.
+Estado: En curso · Décimo semestre (graduación estimada: primer semestre de 2027)
+Formación técnica: Técnico en Sistemas · SENA
+Interests: Arquitectura de software, Ingeniería de software, Desarrollo de productos digitales, Inteligencia Artificial.
 
 ACHIEVEMENTS
 Small product-like achievement cards:
-- Alto desempeño Saber Pro
-- Ganador de hackatón universitaria
-- Top 10 en hackatón nacional
+- Maratón de Programación 2023 — 1.er puesto
+- Hackathon Colombia 5.0 — Top 10 a nivel nacional (Bogotá, 2026)
+- Saber Pro — puntaje global 188, with the five competency scores
 No diploma styling.
 
 GITHUB
 Important section styled as an original technical dashboard inspired by engineering tools, not copied from GitHub.
-Include profile summary, featured repo slots, language mix placeholder, activity surface, contribution-style visualization placeholder, open-source section.
-If live data unavailable, mark dynamic fields as placeholders and never fabricate counts.
+Evidence, not a dashboard: three real public repositories (Wayra Travel, clinical laboratory system — academic project, Full-Stack .NET project — technical project) and a link to https://github.com/CrixxCode.
+Real public activity (contributions in the last year, public repositories, contribution heatmap) is fetched server-side; if GitHub can't be reached, the block is hidden. Never fabricate counts; no stars/followers.
 
 SERVICES
-Simple, personal-not-agency:
+“Cómo puedo aportar” — personal, not an agency:
 - Desarrollo Full-Stack
-- Backend & APIs
-- Frontend
-- Desarrollo de productos / MVPs y SaaS
+- Análisis y apoyo técnico
+- Colaboración en productos
 
 BLOG
-Section ready for articles about architecture, Django, Angular, full-stack, databases, technical decisions and lessons.
-Initial elegant empty state: “Writing soon.”
+Data-driven list of articles. Current article (in preparation, no URL yet): “Arquitectura, modelo de datos y diseño funcional de una plataforma web para la gestión de información hotelera en Riohacha”. No fake dates, URLs or read buttons until published.
 
 CONTACT
 Strong near-100vh close:
 headline “Construyamos algo juntos.”
 primary CTA “Hablemos”
-social placeholders: Email, LinkedIn, GitHub
+channels: Email (cristiandanrave@gmail.com), LinkedIn, GitHub (CrixxCode), Instagram (crixxcode); available for remote work; no physical location. The form uses mailto: and says the email client will open — never “sent”.
 optional short form: Nombre, Email, Mensaje
 accessible labels and validation.
 
