@@ -34,6 +34,9 @@ type Repo = { name: string; type: string; desc: string; url: string; stack: stri
   /** The main repository gets more visual weight. */
   featured?: boolean };
 
+/** A program in "Education & Achievements". `current` shows `period` as the "in progress" badge. */
+type Program = { degree: string; school: string; period: string; current?: boolean; details: [string, string][] };
+
 /** A competition result in "Education & Achievements". */
 type Achievement = { icon: "trophy" | "medal"; t: string; meta: string; result: string; d: string; org?: string };
 
@@ -48,12 +51,10 @@ type Job = {
   start: string | null;
   /** Contract type, e.g. "Prestación de servicios" / "Independent contractor". */
   mode?: string;
-  /** Department or area inside the organization. */
-  unit?: string;
   /** Kinds of work done (shown after the summary). */
   work?: string;
-  /** Anonymized description of client work (no client or product names). */
-  client?: string;
+  /** The project worked on, in a highlighted box. Client work stays anonymized (no client or product names). */
+  project?: { label: string; text: string };
   /** Practices and concepts, shown as plain text apart from the stack. */
   concepts?: string[];
   note?: string;
@@ -136,13 +137,13 @@ const es = {
     concepts: ["REST", "RBAC", "Multitenancy", "Monolito modular", "Clean Architecture", "MVC", "Diseño relacional"],
   },
   experience: {
-    num: "02", label: "Experiencia", title: "Donde aplico lo que sé.", present: "Actualidad", current: "Actual", clientLabel: "Proyecto para cliente",
+    num: "02", label: "Experiencia", title: "Donde aplico lo que sé.", present: "Actualidad", current: "Actual",
     jobs: [
       {
-        org: "ALGORITHM S.A.S.", role: "Full-Stack Developer Jr.", mode: "Prestación de servicios", start: "2026-06-01",
+        org: "ALGORITHM S.A.S.", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: "2026-06-01",
         summary: "Participo en el desarrollo y evolución de aplicaciones web para clientes de la compañía, trabajando tanto en backend con ASP.NET Core/.NET como en frontend con React.",
         work: "Mi trabajo ha incluido QA y estabilización de soluciones existentes, además de participación en el ciclo completo de desarrollo de una nueva aplicación actualmente en fase de pruebas.",
-        client: "Aplicación web multitenant orientada a la búsqueda y reserva de alojamientos.",
+        project: { label: "Proyecto para cliente", text: "Aplicación web multitenant orientada a la búsqueda y reserva de alojamientos." },
         items: [
           "Desarrollo y mantenimiento de funcionalidades backend con ASP.NET Core/.NET.",
           "Desarrollo de interfaces y flujos frontend con React.",
@@ -158,8 +159,10 @@ const es = {
         note: "Los nombres, código y detalles internos de proyectos desarrollados para clientes se mantienen confidenciales.",
       },
       {
-        org: "Universidad de La Guajira", unit: "Vicerrectoría de Docencia", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: UNIGUAJIRA_START,
-        summary: "Vinculado a la Vicerrectoría de Docencia de la Universidad de La Guajira para apoyar el desarrollo y evolución técnica del Ejercitador Saber Pro, trabajando como desarrollador Full-Stack sobre una base de código existente.",
+        org: "Universidad de La Guajira", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: UNIGUAJIRA_START,
+        summary: "Vinculado a la Vicerrectoría de Docencia de la Universidad de La Guajira para apoyar el desarrollo y evolución técnica del Ejercitador Saber Pro.",
+        work: "Trabajo como desarrollador Full-Stack sobre una base de código existente, con foco en QA, pruebas, corrección de errores y refactorización.",
+        project: { label: "Proyecto institucional", text: "Ejercitador Saber Pro: plataforma orientada a la preparación, entrenamiento y evaluación de competencias genéricas de las pruebas Saber Pro." },
         items: [
           "QA funcional y técnico del sistema.",
           "Ejecución de pruebas transversales entre módulos.",
@@ -170,17 +173,19 @@ const es = {
         ],
         stack: ["Django", "FastAPI", "React", "MySQL"],
         concepts: ["QA", "Pruebas", "Refactorización"],
+        note: "El repositorio del Ejercitador Saber Pro es privado, por eso no tiene enlace público.",
       },
     ] as Job[],
   },
   education: {
     num: "05", label: "Formación y logros", title: "Formación, resultados y crecimiento técnico.",
-    degree: "Ingeniería de Sistemas", school: "Universidad de La Guajira",
-    statusL: "Estado", status: "En curso · Décimo semestre",
-    gradL: "Graduación estimada", grad: "Primer semestre de 2027",
+    programs: [
+      { degree: "Ingeniería de Sistemas", school: "Universidad de La Guajira", period: "En curso", current: true,
+        details: [["Semestre", "Décimo"], ["Graduación estimada", "Primer semestre de 2027"]] },
+      { degree: "Técnico en Sistemas", school: "SENA", period: "2020 – 2021", details: [["Estado", "Finalizado"]] },
+    ] as Program[],
     interestsL: "Intereses", interests: ["Arquitectura de software", "Ingeniería de software", "Desarrollo de productos digitales", "Inteligencia Artificial"],
     englishL: "Inglés", english: "B2 · Saber Pro",
-    techL: "Formación técnica", tech: "Técnico en Sistemas", techSchool: "SENA",
   },
   achievements: {
     label: "Logros",
@@ -316,13 +321,13 @@ const en: typeof es = {
     concepts: ["REST", "RBAC", "Multitenancy", "Modular monolith", "Clean Architecture", "MVC", "Relational design"],
   },
   experience: {
-    num: "02", label: "Experience", title: "Where I put it to work.", present: "Present", current: "Current", clientLabel: "Client project",
+    num: "02", label: "Experience", title: "Where I put it to work.", present: "Present", current: "Current",
     jobs: [
       {
         org: "ALGORITHM S.A.S.", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: "2026-06-01",
         summary: "I contribute to the development and evolution of web applications for company clients, working on backend development with ASP.NET Core/.NET and frontend development with React.",
         work: "My work has included QA and stabilization of existing solutions, as well as taking part in the full development cycle of a new application that is currently in its testing phase.",
-        client: "Multitenant web application for searching and booking accommodation.",
+        project: { label: "Client project", text: "Multitenant web application for searching and booking accommodation." },
         items: [
           "Building and maintaining backend features with ASP.NET Core/.NET.",
           "Building frontend interfaces and flows with React.",
@@ -338,8 +343,10 @@ const en: typeof es = {
         note: "Client names, source code and internal project details remain confidential.",
       },
       {
-        org: "Universidad de La Guajira", unit: "Vice-Rector’s Office for Teaching", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: UNIGUAJIRA_START,
-        summary: "Working with the Vice-Rector’s Office for Teaching at Universidad de La Guajira to support the development and technical evolution of the Ejercitador Saber Pro platform, as a full-stack developer on an existing codebase.",
+        org: "Universidad de La Guajira", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: UNIGUAJIRA_START,
+        summary: "Working with the Vice-Rector’s Office for Teaching at Universidad de La Guajira to support the development and technical evolution of the Ejercitador Saber Pro platform.",
+        work: "I work as a full-stack developer on an existing codebase, focusing on QA, testing, bug fixing and refactoring.",
+        project: { label: "Institutional project", text: "Ejercitador Saber Pro: a platform for preparing, training and assessing the generic competencies evaluated in Colombia’s Saber Pro exams." },
         items: [
           "Functional and technical QA of the system.",
           "Running cross-module tests.",
@@ -350,17 +357,19 @@ const en: typeof es = {
         ],
         stack: ["Django", "FastAPI", "React", "MySQL"],
         concepts: ["QA", "Testing", "Refactoring"],
+        note: "The Ejercitador Saber Pro repository is private, so it has no public link.",
       },
     ] as Job[],
   },
   education: {
     num: "05", label: "Education & Achievements", title: "Education, results and technical growth.",
-    degree: "Systems Engineering", school: "Universidad de La Guajira",
-    statusL: "Status", status: "In progress · Tenth semester",
-    gradL: "Expected graduation", grad: "First half of 2027",
+    programs: [
+      { degree: "Systems Engineering", school: "Universidad de La Guajira", period: "In progress", current: true,
+        details: [["Semester", "Tenth"], ["Expected graduation", "First half of 2027"]] },
+      { degree: "Systems Technician", school: "SENA", period: "2020 – 2021", details: [["Status", "Completed"]] },
+    ],
     interestsL: "Interests", interests: ["Software Architecture", "Software Engineering", "Digital Product Development", "Artificial Intelligence"],
     englishL: "English", english: "B2 · Saber Pro",
-    techL: "Technical training", tech: "Systems Technician", techSchool: "SENA",
   },
   achievements: {
     label: "Achievements",

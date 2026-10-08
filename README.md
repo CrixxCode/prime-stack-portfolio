@@ -14,7 +14,7 @@ PROFILE CONTENT
 - Also works with/has experience with: Python, ASP.NET Core / .NET, C#, React, Node.js, Java, TypeScript, JavaScript, PostgreSQL, MySQL, SQL Server, Docker, Git, Postman, WSL, Railway.
 - Primary stack: Django + Angular. Current professional work: ASP.NET Core / .NET + React.
 - Message: takes part in the whole product cycle (problem, requirements, architecture, data, backend, frontend, UX, testing); value comes from transferable fundamentals; growing interest in software architecture (not presented as an architect).
-- Education: Ingeniería de Sistemas, Universidad de La Guajira — in progress, tenth semester, expected graduation first half of 2027. Technical training: Técnico en Sistemas, SENA.
+- Education: Ingeniería de Sistemas, Universidad de La Guajira — in progress, tenth semester, expected graduation first half of 2027. Separate program: Técnico en Sistemas, SENA, 2020–2021 (completed).
 - Interests: software architecture, software engineering, digital product development, AI.
 - English level: B2 (based on Saber Pro results; not an international certification).
 - Experience:
@@ -121,7 +121,7 @@ EDUCATION
 Ingeniería de Sistemas
 Universidad de La Guajira
 Estado: En curso · Décimo semestre (graduación estimada: primer semestre de 2027)
-Formación técnica: Técnico en Sistemas · SENA
+Técnico en Sistemas · SENA · 2020 – 2021 · Finalizado (formación independiente, no parte de la ingeniería)
 Interests: Arquitectura de software, Ingeniería de software, Desarrollo de productos digitales, Inteligencia Artificial.
 
 ACHIEVEMENTS

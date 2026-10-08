@@ -147,10 +147,11 @@ export function Stack() {
       <div className="container-x">
       <Head num={s.num} label={s.label} title={s.title} />
       <p className="mb-4 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.byDomain}</p>
-      {/* Four columns only from xl: below that, labels would not fit next to the names */}
-      <div className="grid border-l border-t border-border sm:grid-cols-2 xl:grid-cols-4">
+      {/* Each column is at least as wide as its longest row (name + label on one line); the rest of the width is
+          shared out, with less for Tools, which has no labels. Two columns only from lg, where those rows fit. */}
+      <div className="grid border-l border-t border-border lg:grid-cols-2 xl:grid-cols-[minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,0.6fr)]">
         {s.groups.map((g, gi) => (
-          <Reveal key={g.name} delay={gi * 35} className="border-b border-r border-border p-6">
+          <Reveal key={g.name} delay={gi * 35} className="border-b border-r border-border p-5 sm:p-6">
             <h3 className="mb-6 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{g.name}</h3>
             <ul className="space-y-3">
               {g.items.map(([n, l]) => (
@@ -206,14 +207,13 @@ export function Experience() {
             </div>
             <div className="md:col-span-8">
               <h3 className="text-[clamp(2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em] text-balance">{job.org}</h3>
-              {job.unit && <p className="mt-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">{job.unit}</p>}
               <p className="mt-3 text-xl text-muted-foreground">{job.role}{job.mode && <> · {job.mode}</>}</p>
               <p className="mt-6 max-w-2xl text-[15px] leading-relaxed">{job.summary}</p>
               {job.work && <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">{job.work}</p>}
-              {job.client && (
+              {job.project && (
                 <div className="mt-6 max-w-2xl rounded-xl border border-border bg-surface p-4">
-                  <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{e.clientLabel}</div>
-                  <p className="mt-1.5 text-[15px]">{job.client}</p>
+                  <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{job.project.label}</div>
+                  <p className="mt-1.5 text-[15px]">{job.project.text}</p>
                 </div>
               )}
               <ul className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
@@ -236,20 +236,28 @@ export function Education() {
   return (
     <section id="education" className="container-x py-24 md:py-36">
       <Head num={e.num} label={e.label} title={e.title} />
-      <Reveal className="grid gap-10 md:grid-cols-12">
-        <div className="md:col-span-7">
-          <h3 className="text-[clamp(2rem,4.6vw,3.6rem)] font-semibold leading-[1] tracking-[-0.035em]">{e.degree}</h3>
-          <p className="mt-3 text-xl text-muted-foreground">{e.school}</p>
-          {/* Complementary technical training: lighter than the degree on purpose */}
-          <div className="mt-8 max-w-md border-t border-border pt-5">
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{e.techL}</p>
-            <p className="mt-2 text-lg font-medium">{e.tech}</p>
-            <p className="text-muted-foreground">{e.techSchool}</p>
-          </div>
-        </div>
-        <dl className="space-y-6 md:col-span-5">
-          <div><dt className="text-sm text-muted-foreground">{e.statusL}</dt><dd className="mt-1">{e.status}</dd></div>
-          <div><dt className="text-sm text-muted-foreground">{e.gradL}</dt><dd className="mt-1">{e.grad}</dd></div>
+      {/* One entry per program, each with its own period and details (same layout as Experience) */}
+      <ol className="divide-y divide-border border-b border-border">
+        {e.programs.map((pr, i) => (
+          <Reveal as="li" key={pr.degree} delay={i * 40} className={`grid gap-4 pb-10 md:grid-cols-12 md:gap-8 ${i > 0 ? "pt-10" : ""}`}>
+            <div className="md:col-span-4">
+              {pr.current
+                ? <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{pr.period}</span>
+                : <span className="font-mono text-xs text-muted-foreground">{pr.period}</span>}
+            </div>
+            <div className="md:col-span-8">
+              <h3 className="text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-none tracking-[-0.035em]">{pr.degree}</h3>
+              <p className="mt-3 text-xl text-muted-foreground">{pr.school}</p>
+              <dl className="mt-6 flex flex-wrap gap-x-12 gap-y-4">
+                {pr.details.map(([k, v]) => <div key={k}><dt className="text-sm text-muted-foreground">{k}</dt><dd className="mt-1">{v}</dd></div>)}
+              </dl>
+            </div>
+          </Reveal>
+        ))}
+      </ol>
+      {/* Not tied to either program */}
+      <Reveal className="mt-10 grid md:grid-cols-12 md:gap-8">
+        <dl className="grid gap-6 sm:grid-cols-[1fr_auto] sm:gap-12 md:col-span-8 md:col-start-5">
           <div><dt className="text-sm text-muted-foreground">{e.interestsL}</dt><dd className="mt-2 flex flex-wrap gap-1.5">{e.interests.map((x) => <Tag key={x}>{x}</Tag>)}</dd></div>
           <div><dt className="text-sm text-muted-foreground">{e.englishL}</dt><dd className="mt-1">{e.english}</dd></div>
         </dl>
