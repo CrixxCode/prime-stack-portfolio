@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
-import { ArrowRight, ArrowUpRight, Award, Clock, ShieldCheck, Code2, Github, Linkedin, Lock, Mail, Trophy, Medal, Server, Layout, Rocket, Layers } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getGithubActivity, type GithubActivity } from "@/lib/github-activity";
+import { ArrowRight, ArrowUpRight, Award, ShieldCheck, FolderGit2, Github, Instagram, Linkedin, Lock, Mail, Trophy, Medal, Server, Rocket, Layers } from "lucide-react";
 import { Reveal, useSite } from "@/lib/site";
 import { CONTACT } from "@/lib/i18n";
 import { HotelMock, ExamMock } from "./Mocks";
@@ -53,9 +55,10 @@ export function About() {
       </Reveal>
       <dl className="mt-14 grid grid-cols-2 border-l border-t border-border md:grid-cols-4">
         {t.stats.map((s, i) => (
-          <Reveal key={s.l} delay={i * 35} className="flex flex-col border-b border-r border-border p-5 md:p-7">
+          <Reveal key={s.l} delay={i * 35} className="@container flex flex-col border-b border-r border-border p-5 md:p-7">
             <dt className="order-2 mt-2 text-sm text-muted-foreground">{s.l}</dt>
-            <dd className="text-2xl font-semibold tracking-tight tabular-nums md:text-4xl">{s.v}</dd>
+            {/* Value never wraps ("End-to-End" would split at the hyphen); its size follows the cell width, capped at the previous 36px */}
+            <dd className="whitespace-nowrap text-[clamp(1rem,18cqi,2.25rem)] font-semibold tracking-tight tabular-nums">{s.v}</dd>
           </Reveal>
         ))}
       </dl>
@@ -96,7 +99,7 @@ export function Projects() {
                 <Reveal delay={60}><p className="mt-4 text-lg text-muted-foreground">{it.desc}</p></Reveal>
                 <Reveal delay={90}>
                   <dl className="mt-8 divide-y divide-border border-y border-border text-sm">
-                    {([[p.origin, it.origin], [p.problem, it.problem], [p.role, it.role], [p.participation, it.participation]] as const).map(([k, v]) => v && (
+                    {([[p.origin, it.origin], [p.context, it.context], [p.problem, it.problem], [p.myRole, it.roleTitle], [p.participation, it.participation]] as const).map(([k, v]) => v && (
                       <div key={k} className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{k}</dt><dd>{v}</dd></div>
                     ))}
                     <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.features}</dt>
@@ -104,8 +107,8 @@ export function Projects() {
                     <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.stack}</dt><dd className="flex flex-wrap gap-1.5">{it.stack.map((s) => <Tag key={s}>{s}</Tag>)}</dd></div>
                     {/* Concepts are ideas, not tools: plain text instead of the stack's tags */}
                     {it.concepts && <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.concepts}</dt><dd className="text-muted-foreground">{it.concepts.join(" · ")}</dd></div>}
+                    {it.work && <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.work}</dt><dd className="text-muted-foreground">{it.work.join(" · ")}</dd></div>}
                     <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.status}</dt><dd className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{it.status}</dd></div>
-                    {!it.links && <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.repo}</dt><dd className="flex items-center gap-2 text-muted-foreground"><Lock className="h-3.5 w-3.5" />{p.private}</dd></div>}
                   </dl>
                 </Reveal>
                 {it.decision && (
@@ -117,8 +120,8 @@ export function Projects() {
                     </div>
                   </Reveal>
                 )}
-                <Reveal delay={120}>
-                  {it.links ? (
+                {it.links && (
+                  <Reveal delay={120}>
                     <div className="mt-8 flex flex-wrap gap-3">
                       <a href={it.links.demo} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">
                         {p.demo}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {it.name} {p.newTab}</span>
@@ -127,12 +130,8 @@ export function Projects() {
                         <Github className="h-4 w-4" aria-hidden="true" />{p.github}<span className="sr-only">: {it.name} {p.newTab}</span>
                       </a>
                     </div>
-                  ) : (
-                    <p className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-border-strong px-5 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4" />{p.soon}
-                    </p>
-                  )}
-                </Reveal>
+                  </Reveal>
+                )}
               </div>
             </article>); })}
         </div>
@@ -143,20 +142,25 @@ export function Projects() {
 
 export function Stack() {
   const { t } = useSite(); const s = t.stack;
-  const flows = [["Backend", ["Django", ".NET", "Node"]], ["Frontend", ["Angular", "React"]]] as const;
   return (
     <section id="stack" className="border-t border-border py-24 md:py-36">
       <div className="container-x">
       <Head num={s.num} label={s.label} title={s.title} />
-      <div className="grid border-l border-t border-border sm:grid-cols-2 lg:grid-cols-4">
+      <p className="mb-4 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.byDomain}</p>
+      {/* Four columns only from xl: below that, labels would not fit next to the names */}
+      <div className="grid border-l border-t border-border sm:grid-cols-2 xl:grid-cols-4">
         {s.groups.map((g, gi) => (
           <Reveal key={g.name} delay={gi * 35} className="border-b border-r border-border p-6">
             <h3 className="mb-6 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{g.name}</h3>
             <ul className="space-y-3">
               {g.items.map(([n, l]) => (
-                <li key={n} className="flex items-center justify-between gap-3 text-[15px]">
-                  <span translate="no" className={l === "p" ? "font-medium" : ""}>{n}</span>
-                  {l && <Tag tone={l === "p" ? "border-primary/40 text-primary" : ""}>{l === "p" ? s.principal : s.exp}</Tag>}
+                // Usage context, not skill level: primary and professional get a tag; hands-on is quieter plain text
+                <li key={n} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[15px]">
+                  <span translate="no" className={l === "p" ? "font-medium" : l === "h" ? "text-muted-foreground" : ""}>{n}</span>
+                  {/* ml-auto keeps the label right-aligned even when it has to wrap below a long name */}
+                  {l === "p" && <span className="ml-auto"><Tag tone="border-primary/40 text-primary">{s.levels.p}</Tag></span>}
+                  {l === "w" && <span className="ml-auto"><Tag>{s.levels.w}</Tag></span>}
+                  {l === "h" && <span className="ml-auto font-mono text-xs text-muted-foreground">{s.levels.h}</span>}
                 </li>
               ))}
             </ul>
@@ -165,23 +169,15 @@ export function Stack() {
       </div>
       <Reveal className="mt-14 grid gap-10 rounded-2xl border border-border bg-surface p-7 md:grid-cols-[1fr_1.2fr] md:p-10">
         <div>
-          <h3 className="text-2xl font-semibold tracking-[-0.03em] md:text-3xl">{s.adaptTitle}</h3>
-          <p className="mt-3 text-muted-foreground">{s.adaptText}</p>
+          <h3 className="text-2xl font-semibold tracking-[-0.03em] md:text-3xl">{s.fundamentalsTitle}</h3>
+          <p className="mt-3 text-muted-foreground">{s.fundamentalsText}</p>
         </div>
-        <div className="space-y-5 self-center">
-          {flows.map(([name, steps]) => (
-            <div key={name} className="grid grid-cols-[80px_1fr] items-center gap-3">
-              <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{name}</span>
-              <ol className="flex flex-wrap items-center gap-2">
-                {steps.map((st, i) => (
-                  <li key={st} className="flex items-center gap-2">
-                    {i > 0 && <ArrowRight className="h-3.5 w-3.5 text-primary" aria-hidden="true" />}
-                    <span translate="no" className={`rounded-md border px-3 py-1.5 font-mono text-xs ${i === 0 ? "border-primary/50 bg-primary/10 text-foreground" : "border-border-strong bg-card"}`}>{st}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          ))}
+        <div className="self-center">
+          <h4 className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.conceptsTitle}</h4>
+          {/* Concepts and practices, not technologies: plain sans text in dashed outlines, apart from the mono tech tags */}
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {s.concepts.map((c) => <li key={c} className="rounded-full border border-dashed border-border-strong px-3 py-1 text-sm">{c}</li>)}
+          </ul>
         </div>
       </Reveal>
       </div>
@@ -191,26 +187,44 @@ export function Stack() {
 
 export function Experience() {
   const { t, lang } = useSite(); const e = t.experience;
-  const start = new Intl.DateTimeFormat(lang, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${e.start}T00:00:00Z`));
+  // Month + year, capitalized ("Junio de 2026" / "June 2026")
+  const monthYear = (iso: string) => {
+    const s = new Intl.DateTimeFormat(lang, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
   return (
     <section id="experience" className="border-t border-border py-24 md:py-36">
       <div className="container-x">
         <Head num={e.num} label={e.label} title={e.title} />
-        <Reveal as="article" className="grid gap-8 md:grid-cols-12">
-          <div className="md:col-span-4">
-            <div className="font-mono text-xs text-muted-foreground"><time dateTime={e.start}>{start}</time> – {e.present}</div>
-            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{e.current}</span>
-          </div>
-          <div className="md:col-span-8">
-            <h3 className="text-[clamp(2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em]">{e.company}</h3>
-            <p className="mt-3 text-xl text-muted-foreground">{e.role}</p>
-            <ul className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
-              {e.items.map((x, i) => <li key={x} className="bg-background p-5 text-[15px]"><span className="mb-2 block font-mono text-[11px] text-muted-foreground">0{i + 1}</span>{x}</li>)}
-            </ul>
-            <div className="mt-6 flex flex-wrap gap-1.5">{[".NET", "React", "APIs", "SQL", "Git"].map((x) => <Tag key={x}>{x}</Tag>)}</div>
-            <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground"><Lock className="h-3.5 w-3.5" />{e.note}</p>
-          </div>
-        </Reveal>
+        {e.jobs.map((job, ji) => (
+          <Reveal as="article" key={job.org} className={`grid gap-8 md:grid-cols-12 ${ji > 0 ? "mt-20 border-t border-border pt-16 md:mt-28 md:pt-20" : ""}`}>
+            <div className="md:col-span-4">
+              <div className="font-mono text-xs text-muted-foreground">
+                {job.start ? <><time dateTime={job.start.slice(0, 7)}>{monthYear(job.start)}</time> – {e.present}</> : e.present}
+              </div>
+              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{e.current}</span>
+            </div>
+            <div className="md:col-span-8">
+              <h3 className="text-[clamp(2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em] text-balance">{job.org}</h3>
+              {job.unit && <p className="mt-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">{job.unit}</p>}
+              <p className="mt-3 text-xl text-muted-foreground">{job.role}{job.mode && <> · {job.mode}</>}</p>
+              <p className="mt-6 max-w-2xl text-[15px] leading-relaxed">{job.summary}</p>
+              {job.work && <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">{job.work}</p>}
+              {job.client && (
+                <div className="mt-6 max-w-2xl rounded-xl border border-border bg-surface p-4">
+                  <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{e.clientLabel}</div>
+                  <p className="mt-1.5 text-[15px]">{job.client}</p>
+                </div>
+              )}
+              <ul className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
+                {job.items.map((x, i) => <li key={x} className="bg-background p-5 text-[15px]"><span className="mb-2 block font-mono text-[11px] text-muted-foreground" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>{x}</li>)}
+              </ul>
+              <div className="mt-6 flex flex-wrap gap-1.5">{job.stack.map((x) => <Tag key={x}>{x}</Tag>)}</div>
+              {job.concepts && <p className="mt-3 text-sm text-muted-foreground">{job.concepts.join(" · ")}</p>}
+              {job.note && <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground"><Lock className="h-3.5 w-3.5 shrink-0" />{job.note}</p>}
+            </div>
+          </Reveal>
+        ))}
       </div>
     </section>
   );
@@ -218,7 +232,7 @@ export function Experience() {
 
 export function Education() {
   const { t } = useSite(); const e = t.education; const a = t.achievements;
-  const icons = [Award, Trophy, Medal];
+  const icons = { trophy: Trophy, medal: Medal };
   return (
     <section id="education" className="container-x py-24 md:py-36">
       <Head num={e.num} label={e.label} title={e.title} />
@@ -226,82 +240,132 @@ export function Education() {
         <div className="md:col-span-7">
           <h3 className="text-[clamp(2rem,4.6vw,3.6rem)] font-semibold leading-[1] tracking-[-0.035em]">{e.degree}</h3>
           <p className="mt-3 text-xl text-muted-foreground">{e.school}</p>
+          {/* Complementary technical training: lighter than the degree on purpose */}
+          <div className="mt-8 max-w-md border-t border-border pt-5">
+            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{e.techL}</p>
+            <p className="mt-2 text-lg font-medium">{e.tech}</p>
+            <p className="text-muted-foreground">{e.techSchool}</p>
+          </div>
         </div>
         <dl className="space-y-6 md:col-span-5">
           <div><dt className="text-sm text-muted-foreground">{e.statusL}</dt><dd className="mt-1">{e.status}</dd></div>
+          <div><dt className="text-sm text-muted-foreground">{e.gradL}</dt><dd className="mt-1">{e.grad}</dd></div>
           <div><dt className="text-sm text-muted-foreground">{e.interestsL}</dt><dd className="mt-2 flex flex-wrap gap-1.5">{e.interests.map((x) => <Tag key={x}>{x}</Tag>)}</dd></div>
           <div><dt className="text-sm text-muted-foreground">{e.englishL}</dt><dd className="mt-1">{e.english}</dd></div>
         </dl>
       </Reveal>
       <div className="mt-16 md:mt-24">
         <Reveal><h3 className="mb-6 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{a.label}</h3></Reveal>
-        <div className="grid gap-4 md:grid-cols-3">
-          {a.items.map((x, i) => { const I = icons[i] ?? Award; return (
+        <div className="grid gap-4 md:grid-cols-2">
+          {a.items.map((x, i) => { const I = icons[x.icon]; return (
             <Reveal key={x.t} delay={i * 40}>
-              <article className="h-full rounded-xl border border-border bg-card p-6">
-                <div className="flex items-center justify-between"><I className="h-5 w-5 text-primary" aria-hidden="true" /><span className="font-mono text-xs text-muted-foreground">{x.k}</span></div>
-                <h4 className="mt-10 text-xl font-semibold tracking-tight">{x.t}</h4>
-                <p className="mt-2 text-sm text-muted-foreground">{x.d}</p>
+              <article className="flex h-full flex-col rounded-xl border border-border bg-card p-6">
+                <div className="flex items-center justify-between"><I className="h-5 w-5 text-primary" aria-hidden="true" /><span className="font-mono text-xs text-muted-foreground">{x.meta}</span></div>
+                <h4 className="mt-8 text-xl font-semibold tracking-tight">{x.t}</h4>
+                <p className="mt-1 font-medium text-primary">{x.result}</p>
+                <p className="mt-3 text-sm text-muted-foreground">{x.d}</p>
+                {x.org && <p className="mt-auto pt-4 font-mono text-xs text-muted-foreground">{x.org}</p>}
               </article>
             </Reveal>); })}
+          {/* Saber Pro: the overall score leads; the five competencies stay secondary */}
+          <Reveal delay={80} className="md:col-span-2">
+            <article className="grid gap-6 rounded-xl border border-border bg-card p-6 md:grid-cols-[auto_1fr] md:items-center md:gap-10">
+              <div>
+                <div className="flex items-center gap-3"><Award className="h-5 w-5 text-primary" aria-hidden="true" /><h4 className="text-xl font-semibold tracking-tight">{a.saber.t}</h4></div>
+                <p className="mt-4 flex items-baseline gap-2"><span className="text-5xl font-semibold tracking-tight tabular-nums">{a.saber.global}</span><span className="text-sm text-muted-foreground">{a.saber.globalL}</span></p>
+              </div>
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-5">
+                {a.saber.scores.map(([v, l]) => (
+                  <div key={l} className="flex flex-col-reverse justify-end border-t border-border pt-3">
+                    <dt className="mt-1 text-xs text-muted-foreground">{l}</dt>
+                    <dd className="text-2xl font-semibold tabular-nums">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          </Reveal>
         </div>
       </div>
     </section>
   );
 }
 
+// Real contribution heatmap: one SVG path per activity level (0–4), drawn column by column like GitHub.
+const LEVEL_OPACITY = [0.08, 0.35, 0.55, 0.78, 1];
+function ActivityMap({ days, label }: { days: GithubActivity["days"]; label: string }) {
+  const first = days[0];
+  if (!first) return null;
+  const startWeekday = new Date(`${first.date}T00:00:00Z`).getUTCDay();
+  const paths = ["", "", "", "", ""];
+  days.forEach((d, i) => {
+    const slot = i + startWeekday;
+    const x = Math.floor(slot / 7) * 13 + 1, y = (slot % 7) * 13 + 1;
+    paths[d.level] += `M${x} ${y}h8v8h-8z`; // 8px square + 2px round stroke = 10px with soft corners
+  });
+  const width = Math.ceil((days.length + startWeekday) / 7) * 13 - 3;
+  return (
+    <svg viewBox={`0 0 ${width} ${7 * 13 - 3}`} role="img" aria-label={label} className="block h-auto w-full">
+      {paths.map((d, level) => d && <path key={level} d={d} fill="var(--primary)" stroke="var(--primary)" strokeWidth={2} strokeLinejoin="round" opacity={LEVEL_OPACITY[level]} />)}
+    </svg>
+  );
+}
+
 export function GitHubPanel() {
-  const { t } = useSite(); const g = t.github;
-  // Activity heatmap as one SVG: one path per intensity level instead of 280 divs.
-  // Cells are 10px with a 3px gap, filled column by column (7 rows × 40 weeks).
-  const levels = Array.from({ length: 11 }, () => "");
-  for (let i = 0; i < 7 * 40; i++) {
-    const x = Math.floor(i / 7) * 13 + 1, y = (i % 7) * 13 + 1;
-    levels[(i * 37) % 11] += `M${x} ${y}h8v8h-8z`; // 8px square + 2px round stroke = 10px with soft corners
-  }
-  const Ph = () => <span className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{g.ph}</span>;
+  const { t, lang } = useSite(); const g = t.github;
+  // Fetched after the page renders (the section is far below the fold); hidden if GitHub can't be reached
+  const { data: activity } = useQuery({ queryKey: ["github-activity"], queryFn: () => getGithubActivity(), staleTime: Infinity, retry: false });
+  const fmt = new Intl.NumberFormat(lang);
   return (
     <section id="github" className="flex min-h-dvh items-center bg-surface/40 py-24 md:py-36">
       <div className="container-x">
         <Head num={g.num} label={g.label} title={g.title} />
-        <Reveal className="overflow-hidden rounded-2xl border border-border-strong bg-card shadow-soft">
-          <div className="flex items-center justify-between border-b border-border px-5 py-3 font-mono text-xs text-muted-foreground">
-            <span className="flex items-center gap-2"><Github className="h-4 w-4" />github / {CONTACT.githubUser}</span>
-            <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />{g.placeholder}</span>
-          </div>
-          <div className="grid lg:grid-cols-12">
-            <div className="space-y-5 border-b border-border p-6 lg:col-span-4 lg:border-b-0 lg:border-r">
-              <div className="flex items-center justify-between"><h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.profile}</h3><Ph /></div>
-              <div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-full border border-border-strong bg-surface-2 font-mono text-xs">{CONTACT.initials}</div><div><div className="font-medium">{CONTACT.name}</div><a href={CONTACT.github} className="font-mono text-xs text-muted-foreground hover:text-foreground">@{CONTACT.githubUser}</a></div></div>
-              <dl className="grid grid-cols-3 gap-2 text-center">{g.stats.map((k) => <div key={k} className="flex flex-col-reverse rounded-lg border border-border p-2"><dt className="text-xs text-muted-foreground">{k}</dt><dd className="font-mono text-lg">—</dd></div>)}</dl>
-              <div>
-                <div className="mb-2 flex items-center justify-between"><h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.langs}</h3><Ph /></div>
-                <div className="flex h-2 overflow-hidden rounded-full bg-surface-2"><div className="w-2/5 bg-primary/70" /><div className="w-1/4 bg-brand-2/60" /><div className="w-1/6 bg-border-strong" /></div>
-                <div className="mt-2 flex gap-3 font-mono text-xs text-muted-foreground"><span>Python</span><span>TypeScript</span><span>C#</span></div>
-              </div>
-            </div>
-            <div className="space-y-6 p-6 lg:col-span-8">
-              <div>
-                <div className="mb-3 flex items-center justify-between"><h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.activity}</h3><Ph /></div>
-                <div className="overflow-x-auto"><svg width={40 * 13 - 3} height={7 * 13 - 3} aria-hidden="true" className="block">
-                  {levels.map((d, v) => <path key={v} d={d} fill="var(--primary)" stroke="var(--primary)" strokeWidth={2} strokeLinejoin="round" opacity={0.06 + (v / 10) * 0.25} />)}
-                </svg></div>
-              </div>
-              <div>
-                <h3 className="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.repos}</h3>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[0, 1].map((i) => (
-                    <div key={i} className="rounded-lg border border-dashed border-border-strong p-4">
-                      <div className="flex items-center gap-2 text-sm"><Code2 className="h-4 w-4 text-muted-foreground" />{g.slot} 0{i + 1}</div>
-                      <div className="mt-3 space-y-1.5"><div className="h-1.5 w-4/5 rounded bg-surface-2" /><div className="h-1.5 w-1/2 rounded bg-surface-2" /></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-lg bg-surface p-4"><h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{g.oss}</h3><p className="mt-1 text-sm text-muted-foreground">{g.ossText}</p></div>
-            </div>
-          </div>
+        <Reveal className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <p className="max-w-2xl text-lg text-muted-foreground">{g.intro}</p>
+          <a href={CONTACT.github} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center gap-2 self-start rounded-full border border-border-strong px-5 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97] md:self-auto">
+            <Github className="h-4 w-4" aria-hidden="true" />{g.profileCta}<span className="sr-only">: {CONTACT.githubUser} {g.newTab}</span>
+          </a>
         </Reveal>
+        {activity && (
+          // data-source: lets you check in DevTools whether the GITHUB_TOKEN secret is being used
+          <div data-source={activity.source} className="mb-4 rounded-2xl border border-border bg-card p-6 md:p-8">
+            <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+              <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{g.activityTitle}</h3>
+              <dl className="flex gap-8">
+                <div className="flex flex-col-reverse"><dt className="text-sm text-muted-foreground">{g.contributionsL}</dt><dd className="text-3xl font-semibold tabular-nums">{fmt.format(activity.total)}</dd></div>
+                {activity.publicRepos !== null && <div className="flex flex-col-reverse"><dt className="text-sm text-muted-foreground">{g.reposL}</dt><dd className="text-3xl font-semibold tabular-nums">{fmt.format(activity.publicRepos)}</dd></div>}
+              </dl>
+            </div>
+            <div className="mt-6"><ActivityMap days={activity.days} label={`${fmt.format(activity.total)} ${g.contributionsL} · ${g.activityTitle}`} /></div>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+              <span>{g.source}</span>
+              <span className="flex items-center gap-1.5" aria-hidden="true">{g.less}{LEVEL_OPACITY.map((o) => <span key={o} className="h-2.5 w-2.5 rounded-[2px] bg-primary" style={{ opacity: o }} />)}{g.more}</span>
+            </div>
+          </div>
+        )}
+        {/* Real public repositories only: no stars or forks. The featured one spans both rows on large screens. */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          {g.repos.map((r, i) => (
+            <Reveal key={r.url} delay={i * 40} className={r.featured ? "lg:row-span-2" : ""}>
+              <article className={`flex h-full flex-col rounded-2xl border bg-card ${r.featured ? "border-border-strong p-7 shadow-soft md:p-9" : "border-border p-6"}`}>
+                <div className="flex items-center gap-2">
+                  <FolderGit2 className={`h-4 w-4 ${r.featured ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
+                  <span className={`font-mono text-xs uppercase tracking-wider ${r.featured ? "text-primary" : "text-muted-foreground"}`}>{r.type}</span>
+                </div>
+                <h3 className={`font-semibold tracking-tight ${r.featured ? "mt-6 text-3xl md:text-4xl" : "mt-4 text-xl"}`}>{r.name}</h3>
+                <p className={`mt-3 text-muted-foreground ${r.featured ? "text-base md:text-lg" : "text-sm"}`}>{r.desc}</p>
+                <div className="mt-5 flex flex-wrap gap-1.5">{r.stack.map((x) => <Tag key={x}>{x}</Tag>)}</div>
+                {r.extra && <p className="mt-3 text-sm text-muted-foreground">{r.extra.join(" · ")}</p>}
+                <div className="mt-auto pt-6">
+                  <a href={r.url} target="_blank" rel="noopener noreferrer" className={r.featured
+                    ? "group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]"
+                    : "group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]"}>
+                    {g.cta}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {r.name} {g.newTab}</span>
+                  </a>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -309,7 +373,7 @@ export function GitHubPanel() {
 
 export function Services() {
   const { t } = useSite(); const s = t.services;
-  const icons = [Layers, Server, Layout, Rocket];
+  const icons = [Layers, Server, Rocket];
   return (
     <section className="container-x py-24 md:py-32">
       <Head num={s.num} label={s.label} labelIsHeading />
@@ -321,6 +385,11 @@ export function Services() {
             <p className="col-span-2 text-muted-foreground md:col-span-1">{x.d}</p>
           </Reveal>); })}
       </ul>
+      <Reveal className="mt-8 flex justify-end">
+        <a href="#contact" className="group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-5 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
+          {s.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+        </a>
+      </Reveal>
     </section>
   );
 }
@@ -328,14 +397,28 @@ export function Services() {
 export function Blog() {
   const { t } = useSite(); const b = t.blog;
   return (
-    <section className="border-t border-border py-24 md:py-32" aria-labelledby="blog-h">
+    <section className="border-t border-border py-24 md:py-32">
       <div className="container-x">
-        <Head num={b.num} label={b.label} />
-        <Reveal className="grid place-items-center rounded-2xl border border-dashed border-border-strong bg-surface/50 px-6 py-20 text-center">
-          <h2 id="blog-h" className="text-4xl font-semibold tracking-[-0.03em] md:text-5xl">{b.title}</h2>
-          <p className="mt-3 max-w-lg text-muted-foreground">{b.text}</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-1.5">{b.topics.map((x) => <Tag key={x}>{x}</Tag>)}</div>
-        </Reveal>
+        <Head num={b.num} label={b.label} title={b.title} />
+        <Reveal><p className="-mt-4 mb-10 max-w-2xl text-lg text-muted-foreground md:-mt-8">{b.intro}</p></Reveal>
+        <div className="space-y-4">
+          {b.posts.map((post, i) => (
+            <Reveal as="article" key={post.title} delay={i * 40} className="rounded-2xl border border-border bg-card p-7 md:p-10">
+              {/* Status is a plain badge, not a button: unpublished posts have no link at all */}
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{post.status}</span>
+              <h3 className="mt-5 max-w-4xl text-2xl font-semibold leading-tight tracking-[-0.02em] text-balance md:text-3xl">
+                {post.url ? <a href={post.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary">{post.title}<span className="sr-only"> {b.newTab}</span></a> : post.title}
+              </h3>
+              <p className="mt-4 max-w-3xl text-muted-foreground">{post.desc}</p>
+              <div className="mt-6 flex flex-wrap gap-1.5">{post.topics.map((x) => <Tag key={x}>{x}</Tag>)}</div>
+              {post.url && (
+                <a href={post.url} target="_blank" rel="noopener noreferrer" className="group mt-8 inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-5 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
+                  {b.read}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {post.title} {b.newTab}</span>
+                </a>
+              )}
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -360,7 +443,12 @@ export function Contact() {
     window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Portfolio — " + name)}&body=${encodeURIComponent(msg + "\n\n" + email)}`;
   };
   const field = "mt-2 block w-full rounded-lg border border-input bg-background px-4 py-3 text-[15px] transition-colors placeholder:text-muted-foreground focus:border-primary aria-[invalid=true]:border-destructive";
-  const socials = [{ I: Mail, l: "Email", h: `mailto:${CONTACT.email}` }, { I: Linkedin, l: "LinkedIn", h: CONTACT.linkedin }, { I: Github, l: "GitHub", h: CONTACT.github }];
+  const socials = [
+    { I: Mail, l: "Email", h: `mailto:${CONTACT.email}`, external: false },
+    { I: Linkedin, l: "LinkedIn", h: CONTACT.linkedin, external: true },
+    { I: Github, l: "GitHub", h: CONTACT.github, external: true },
+    { I: Instagram, l: "Instagram", h: CONTACT.instagram, external: true },
+  ];
   return (
     <section id="contact" className="relative flex min-h-dvh items-center overflow-hidden border-t border-border py-24">
       <div className="pointer-events-none absolute inset-0 bg-glow" />
@@ -373,8 +461,15 @@ export function Contact() {
             <Reveal delay={80}>
               <a href={`mailto:${CONTACT.email}`} className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">{t.hero.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></a>
               <ul className="mt-10 flex flex-wrap gap-2">
-                {socials.map(({ I, l, h }) => <li key={l}><a href={h} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]"><I className="h-4 w-4" aria-hidden="true" />{l}</a></li>)}
+                {socials.map(({ I, l, h, external }) => (
+                  <li key={l}>
+                    <a href={h} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
+                      <I className="h-4 w-4" aria-hidden="true" />{l}<span className="sr-only">{external ? ` ${c.newTab}` : `: ${CONTACT.email}`}</span>
+                    </a>
+                  </li>
+                ))}
               </ul>
+              <p className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground"><span className="h-2 w-2 rounded-full bg-success" aria-hidden="true" />{c.remote}</p>
             </Reveal>
           </div>
           <Reveal delay={60} className="lg:col-span-5">
@@ -389,7 +484,7 @@ export function Contact() {
                 </div>
               ))}
               <button type="submit" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-foreground text-sm font-medium text-background transition-transform active:scale-[0.97]">{c.send}<ArrowRight className="h-4 w-4" /></button>
-              <p role="status" aria-live="polite" className="text-sm text-success">{ok && <>{c.ok} {c.okFallback} <a href={`mailto:${CONTACT.email}`} className="underline underline-offset-2">{CONTACT.email}</a>.</>}</p>
+              <p role="status" aria-live="polite" className="text-sm text-muted-foreground">{ok && <>{c.ok} {c.okFallback} <a href={`mailto:${CONTACT.email}`} className="underline underline-offset-2">{CONTACT.email}</a>.</>}</p>
             </form>
           </Reveal>
         </div>
@@ -403,11 +498,23 @@ export function Footer() {
   return (
     <footer className="border-t border-border">
       <div className="container-x flex flex-col gap-6 py-10 text-sm md:flex-row md:items-center md:justify-between">
-        <div><BrandHorizontal className="w-[220px]" /></div>
+        <div>
+          <BrandHorizontal className="w-[220px]" />
+          <p className="mt-3 font-mono text-xs text-muted-foreground">{t.footer.tagline}</p>
+        </div>
         <ul className="flex flex-wrap items-center gap-1 text-muted-foreground">
-          <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={CONTACT.github}>GitHub</a></li>
-          <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={CONTACT.linkedin}>LinkedIn</a></li>
-          <li><a className="inline-flex min-h-11 items-center px-3 hover:text-foreground" href={`mailto:${CONTACT.email}`}>Email</a></li>
+          {[
+            { l: "GitHub", h: CONTACT.github, external: true },
+            { l: "LinkedIn", h: CONTACT.linkedin, external: true },
+            { l: "Email", h: `mailto:${CONTACT.email}`, external: false },
+            { l: "Instagram", h: CONTACT.instagram, external: true },
+          ].map(({ l, h, external }) => (
+            <li key={l}>
+              <a href={h} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="inline-flex min-h-11 items-center px-3 transition-colors hover:text-foreground">
+                {l}<span className="sr-only">{external ? ` ${t.footer.newTab}` : `: ${CONTACT.email}`}</span>
+              </a>
+            </li>
+          ))}
           <li><button type="button" onClick={() => setLang(lang === "es" ? "en" : "es")} aria-label={`ES / EN — ${t.nav.switchLang}`} className="inline-flex min-h-11 items-center px-3 font-mono text-xs hover:text-foreground"><span className={lang === "es" ? "text-foreground" : ""}>ES</span>&nbsp;/&nbsp;<span className={lang === "en" ? "text-foreground" : ""}>EN</span></button></li>
         </ul>
       </div>

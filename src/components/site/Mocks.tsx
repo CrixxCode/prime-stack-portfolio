@@ -37,7 +37,7 @@ export function ExamMock({ label }: { label: string }) {
   return (
     <div className="grid h-full grid-rows-[auto_1fr] overflow-hidden rounded-xl border border-border-strong bg-card text-[10px] shadow-soft" role="img" aria-label={label}>
       <header className="flex items-center justify-between border-b border-border px-4 py-2.5">
-        <span className="text-xs font-semibold">UniguajiraTest</span>
+        <span className="text-xs font-semibold">Saber Pro</span>
         <span className="font-mono text-muted-foreground">simulacro · 24/35</span>
       </header>
       <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-[1.3fr_1fr]">

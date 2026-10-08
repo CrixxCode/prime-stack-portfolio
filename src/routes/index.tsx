@@ -6,10 +6,10 @@ import { Hero } from "@/components/site/Hero";
 import { BrandBanner } from "@/components/site/Brand";
 import { About, Projects, Stack, Experience, Education, GitHubPanel, Services, Blog, Contact, Footer } from "@/components/site/Sections";
 
-const title = "Cristian Ramirez — Full-Stack Developer (Django + Angular)";
+const title = "Cristian Ramirez — Full-Stack Developer";
 const descriptions: Record<Lang, string> = {
-  es: "Portafolio de Cristian Ramirez, Full-Stack Developer: productos digitales de principio a fin con Django, Angular, .NET, React y PostgreSQL.",
-  en: "Portfolio of Cristian Ramirez, Full-Stack Developer: end-to-end digital products with Django, Angular, .NET, React and PostgreSQL.",
+  es: "Portafolio de Cristian Ramirez, Full-Stack Developer enfocado en la construcción de productos web de principio a fin, desde requisitos y arquitectura hasta backend, frontend y experiencia de usuario.",
+  en: "Portfolio of Cristian Ramirez, a Full-Stack Developer focused on building web products end to end, from requirements and architecture to backend, frontend and user experience.",
 };
 
 export const Route = createFileRoute("/")({
@@ -43,9 +43,9 @@ function Index() {
         <Hero />
         <BrandBanner />
         <Projects />
+        <Experience />
         <About />
         <Stack />
-        <Experience />
         <Education />
         <GitHubPanel />
         <Services />

@@ -4,7 +4,11 @@ import { useSite } from "@/lib/site";
 import { CONTACT } from "@/lib/i18n";
 import { BrandLogo } from "./Brand";
 
-const ids = ["home", "projects", "about", "stack", "experience", "education", "github", "contact"] as const;
+// Both lists follow the page order, so the active highlight always moves forward while scrolling.
+// Desktop shows the priority sections; the mobile menu also lists Education and GitHub.
+const mobileIds = ["home", "projects", "experience", "about", "stack", "education", "github", "contact"] as const;
+const desktopIds = ["home", "projects", "experience", "about", "stack", "contact"] as const;
+type NavId = (typeof mobileIds)[number];
 
 export function Nav() {
   const { t, lang, setLang, theme, toggleTheme } = useSite();
@@ -12,14 +16,16 @@ export function Nav() {
   // Menu scales from its trigger: x offset of the menu button inside the panel (panel sits 16px from the edge).
   const [origin, setOrigin] = useState("50% 0");
   const [active, setActive] = useState("home");
-  const nums: Record<(typeof ids)[number], string> = {
+  const nums: Record<NavId, string> = {
     home: "00", projects: t.projects.num, about: t.about.num, stack: t.stack.num, experience: t.experience.num,
     education: t.education.num, github: t.github.num, contact: t.contact.num,
   };
 
+  // Observe every page section, not only the linked ones: in a section without a menu entry
+  // (Services, Blog, or Education/GitHub on desktop) nothing is highlighted, instead of the previous link staying lit.
   useEffect(() => {
     const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setActive(e.target.id)), { rootMargin: "-45% 0px -50% 0px" });
-    ids.forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+    document.querySelectorAll("main > section").forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
   // While open, the menu closes on Escape, on a tap outside the header, or when the page scrolls.
@@ -60,7 +66,7 @@ export function Nav() {
       <nav aria-label={t.nav.label} className="flex w-full max-w-fit items-center gap-1 rounded-full border border-border-strong bg-nav p-1.5 shadow-soft backdrop-blur-xl">
         <a href="#home" className="relative after:absolute after:-inset-x-0.5 after:-inset-y-1 mr-1 shrink-0 rounded-full" aria-label={`${CONTACT.name} — ${t.nav.home}`}><BrandLogo /></a>
         <ul className="hidden items-center lg:flex">
-          {ids.map((id) => (
+          {desktopIds.map((id) => (
             <li key={id}>
               <a href={`#${id}`} aria-current={active === id ? "true" : undefined}
                 className={`relative block rounded-full px-3 py-2 text-[13px] transition-colors ${active === id ? "bg-surface-2 text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
@@ -71,7 +77,7 @@ export function Nav() {
         </ul>
         <span className="mx-1 hidden h-5 w-px bg-border-strong lg:block" />
         {controls}
-        <a href="#contact" className="ml-1 hidden rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition-transform hover:scale-[1.03] active:scale-[0.97] sm:block lg:hidden xl:block">{t.nav.cta}</a>
+        <a href="#contact" className="ml-1 hidden rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition-transform hover:scale-[1.03] active:scale-[0.97] sm:block">{t.nav.cta}</a>
         <button type="button" className="relative after:absolute after:-inset-x-0.5 after:-inset-y-1 grid h-9 w-9 place-items-center rounded-full transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97] lg:hidden" aria-expanded={open} aria-controls="mnav" aria-label={open ? t.nav.close : t.nav.menu}
           onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setOrigin(`${r.left + r.width / 2 - 16}px 0`); setOpen(!open); }}>
           <Menu className="icon-swap h-4 w-4" data-off={open} />
@@ -81,7 +87,7 @@ export function Nav() {
       {/* Always mounted so closing can animate; visibility:hidden keeps it out of tab order and the a11y tree */}
       <div id="mnav" data-open={open} style={{ transformOrigin: origin }} className="mnav absolute inset-x-4 top-16 rounded-2xl border border-border-strong bg-popover p-3 shadow-soft lg:hidden">
           <ul className="grid grid-cols-2 gap-1">
-            {ids.map((id) => (
+            {mobileIds.map((id) => (
               <li key={id}>
                 <a href={`#${id}`} onClick={() => setOpen(false)} className={`flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm ${active === id ? "bg-surface-2 text-foreground" : "text-muted-foreground"}`}>
                   <span className="font-mono text-xs text-muted-foreground" aria-hidden="true">{nums[id]}</span>{t.nav[id]}

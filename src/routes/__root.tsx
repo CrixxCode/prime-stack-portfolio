@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: THEME_COLORS.dark },
       { title: "Cristian Ramirez — Full-Stack Developer" },
-      { name: "description", content: "Portafolio de Cristian Ramirez, Full-Stack Developer." },
+      { name: "description", content: "Portafolio de Cristian Ramirez, Full-Stack Developer enfocado en la construcción de productos web de principio a fin." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: `${SITE_URL}${OG_IMAGE.path}` },
