@@ -128,7 +128,8 @@ export function Hero() {
               <span><span className="hidden sm:inline" aria-hidden="true">· </span>{h.label}</span>
             </span>
           </div>
-          <h1 className="mt-6 text-[clamp(2.6rem,6.4vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-balance">
+          {/* Shorter laptop screens (≤820px tall, e.g. 1366×768) get a slightly smaller title so the whole hero fits above the fold */}
+          <h1 className="mt-6 text-[clamp(2.6rem,6.4vw,5.6rem)] [@media(max-height:820px)]:text-[clamp(2.6rem,5.4vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-balance">
             {h.title}
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">{h.sub}</p>

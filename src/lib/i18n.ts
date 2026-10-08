@@ -5,9 +5,9 @@ const es = {
   hero: {
     label: "Full-Stack Developer",
     title: "Construyo productos digitales de principio a fin.",
-    sub: "Diseño y desarrollo aplicaciones web modernas, escalables y orientadas a producto — desde la arquitectura y las APIs hasta la interfaz final.",
-    stackNote: "Mi stack más fuerte es Django + Angular, pero mi stack es flexible: me adapto rápido a la herramienta que el proyecto necesita.",
-    cta: "Hablemos", cta2: "Ver proyectos", status: "Disponible para oportunidades",
+    sub: "Diseño y desarrollo productos web desde la comprensión del problema hasta una solución funcional: requisitos, arquitectura, datos, backend, frontend y experiencia de usuario.",
+    stackNote: "Mi stack principal es Django + Angular, pero trabajo con fundamentos que me permiten adaptarme a diferentes tecnologías y necesidades de producto.",
+    cta: "Hablemos", cta2: "Ver proyectos", status: "Disponible para proyectos y colaboraciones",
   },
   about: {
     num: "02", label: "Sobre mí", title: "Ingeniería con criterio de producto.",
@@ -86,9 +86,9 @@ const en: typeof es = {
   hero: {
     label: "Full-Stack Developer",
     title: "I build digital products end to end.",
-    sub: "I design and develop modern, scalable, product-oriented web applications — from architecture and APIs to the final interface.",
-    stackNote: "My strongest stack is Django + Angular, but my stack is flexible: I adapt quickly to whatever the project needs.",
-    cta: "Let’s Talk", cta2: "View Projects", status: "Open to opportunities",
+    sub: "I design and build web products from understanding the problem to delivering a functional solution — requirements, architecture, data, backend, frontend and user experience.",
+    stackNote: "My primary stack is Django + Angular, but I work from solid fundamentals that let me adapt to different technologies and product needs.",
+    cta: "Let’s Talk", cta2: "View Projects", status: "Available for projects and collaborations",
   },
   about: {
     num: "02", label: "About", title: "Engineering with product judgment.",
