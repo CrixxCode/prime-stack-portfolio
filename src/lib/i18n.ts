@@ -178,7 +178,7 @@ const es = {
       },
       {
         org: "ALGORITHM S.A.S.", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: "2026-06-01", end: "2026-10-01",
-        summary: "Desarrollo y evolución de aplicaciones web para clientes de la compañía, con ASP.NET Core/.NET en el backend y React en el frontend: QA y estabilización de soluciones existentes, y el ciclo completo de una nueva aplicación, hoy en fase de pruebas.",
+        summary: "Desarrollo y evolución de aplicaciones web para clientes de la compañía, con ASP.NET Core/.NET en el backend y React en el frontend: QA y estabilización de soluciones existentes, y el ciclo completo de una nueva aplicación, que al cierre de mi contrato estaba en fase de pruebas.",
         project: { label: "Proyecto para cliente", text: "Aplicación web multitenant orientada a la búsqueda y reserva de alojamientos." },
         items: [
           "Funcionalidades backend con ASP.NET Core/.NET e interfaces y flujos frontend con React.",
@@ -375,7 +375,7 @@ const en: typeof es = {
       },
       {
         org: "ALGORITHM S.A.S.", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: "2026-06-01", end: "2026-10-01",
-        summary: "Building and evolving web applications for company clients, with ASP.NET Core/.NET on the backend and React on the frontend: QA and stabilization of existing solutions, and the full development cycle of a new application, now in its testing phase.",
+        summary: "Building and evolving web applications for company clients, with ASP.NET Core/.NET on the backend and React on the frontend: QA and stabilization of existing solutions, and the full development cycle of a new application, which was in its testing phase when my contract ended.",
         project: { label: "Client project", text: "Multitenant web application for searching and booking accommodation." },
         items: [
           "Backend features with ASP.NET Core/.NET and frontend interfaces and flows with React.",

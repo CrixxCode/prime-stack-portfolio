@@ -23,7 +23,7 @@ const CV_EXTRA = {
         "Desarrollo de funcionalidades backend con ASP.NET Core/.NET e interfaces y flujos frontend con React.",
         "Diseño y consumo de APIs REST e integración con servicios y APIs de terceros.",
         "Levantamiento y refinamiento de requerimientos; apoyo en diseño de interfaces y experiencia de usuario.",
-        "QA funcional, pruebas transversales y corrección de errores; participación en el ciclo completo de una aplicación multitenant de reservas de alojamiento, en fase de pruebas.",
+        "QA funcional, pruebas transversales y corrección de errores; participación en el ciclo completo de una aplicación multitenant de reservas de alojamiento, en fase de pruebas al cierre del contrato.",
       ] },
       "Universidad de La Guajira": { unit: "Vicerrectoría de Docencia", bullets: [
         "Desarrollo y evolución técnica del Ejercitador Saber Pro sobre una base de código existente (Django, FastAPI, React, MySQL).",
@@ -52,7 +52,7 @@ const CV_EXTRA = {
         "Building backend features with ASP.NET Core/.NET and frontend interfaces and flows with React.",
         "Designing and consuming REST APIs and integrating third-party services and APIs.",
         "Gathering and refining requirements; supporting interface design and user experience decisions.",
-        "Functional QA, cross-module testing and bug fixing; took part in the full development cycle of a multitenant accommodation booking application, now in testing.",
+        "Functional QA, cross-module testing and bug fixing; took part in the full development cycle of a multitenant accommodation booking application, in testing when the contract ended.",
       ] },
       "Universidad de La Guajira": { unit: "Vice-Rector’s Office for Teaching", bullets: [
         "Development and technical evolution of the Ejercitador Saber Pro platform on an existing codebase (Django, FastAPI, React, MySQL).",
