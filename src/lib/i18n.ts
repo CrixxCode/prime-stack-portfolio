@@ -60,6 +60,8 @@ type Job = {
   org: string; role: string; summary: string; items: string[]; stack: string[];
   /** ISO date (YYYY-MM-DD); null while the real start date is not known (only "Present" is shown). */
   start: string | null;
+  /** ISO date of the end; without it the job is current ("Present" and the "Current" badge). Only month and year are shown. */
+  end?: string;
   /** Contract type, e.g. "Prestación de servicios" / "Independent contractor". */
   mode?: string;
   /** The project worked on, in a highlighted box. Client work stays anonymized (no client or product names).
@@ -162,19 +164,6 @@ const es = {
     num: "02", label: "Experiencia", title: "Donde aplico lo que sé.", present: "Actualidad", current: "Actual",
     jobs: [
       {
-        org: "ALGORITHM S.A.S.", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: "2026-06-01",
-        summary: "Desarrollo y evolución de aplicaciones web para clientes de la compañía, con ASP.NET Core/.NET en el backend y React en el frontend: QA y estabilización de soluciones existentes, y el ciclo completo de una nueva aplicación, hoy en fase de pruebas.",
-        project: { label: "Proyecto para cliente", text: "Aplicación web multitenant orientada a la búsqueda y reserva de alojamientos." },
-        items: [
-          "Funcionalidades backend con ASP.NET Core/.NET e interfaces y flujos frontend con React.",
-          "Diseño y consumo de APIs REST e integración con servicios de terceros.",
-          "Levantamiento de requerimientos y apoyo en diseño de interfaces y experiencia de usuario.",
-          "QA funcional, pruebas transversales y corrección de errores.",
-        ],
-        stack: ["ASP.NET Core", ".NET", "React", "Git"],
-        note: "Los nombres, código y detalles internos de proyectos desarrollados para clientes se mantienen confidenciales.",
-      },
-      {
         org: "Universidad de La Guajira", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: UNIGUAJIRA_START,
         summary: "Vinculado a la Vicerrectoría de Docencia para apoyar el desarrollo y la evolución técnica del Ejercitador Saber Pro sobre una base de código existente.",
         project: { label: "Proyecto institucional", text: "Ejercitador Saber Pro", slug: "ejercitador-saber-pro" },
@@ -186,6 +175,19 @@ const es = {
         ],
         stack: ["Django", "FastAPI", "React", "MySQL"],
         note: "El repositorio del Ejercitador Saber Pro es privado, por eso no tiene enlace público.",
+      },
+      {
+        org: "ALGORITHM S.A.S.", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: "2026-06-01", end: "2026-10-01",
+        summary: "Desarrollo y evolución de aplicaciones web para clientes de la compañía, con ASP.NET Core/.NET en el backend y React en el frontend: QA y estabilización de soluciones existentes, y el ciclo completo de una nueva aplicación, hoy en fase de pruebas.",
+        project: { label: "Proyecto para cliente", text: "Aplicación web multitenant orientada a la búsqueda y reserva de alojamientos." },
+        items: [
+          "Funcionalidades backend con ASP.NET Core/.NET e interfaces y flujos frontend con React.",
+          "Diseño y consumo de APIs REST e integración con servicios de terceros.",
+          "Levantamiento de requerimientos y apoyo en diseño de interfaces y experiencia de usuario.",
+          "QA funcional, pruebas transversales y corrección de errores.",
+        ],
+        stack: ["ASP.NET Core", ".NET", "React", "Git"],
+        note: "Los nombres, código y detalles internos de proyectos desarrollados para clientes se mantienen confidenciales.",
       },
     ] as Job[],
   },
@@ -359,19 +361,6 @@ const en: typeof es = {
     num: "02", label: "Experience", title: "Where I put it to work.", present: "Present", current: "Current",
     jobs: [
       {
-        org: "ALGORITHM S.A.S.", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: "2026-06-01",
-        summary: "Building and evolving web applications for company clients, with ASP.NET Core/.NET on the backend and React on the frontend: QA and stabilization of existing solutions, and the full development cycle of a new application, now in its testing phase.",
-        project: { label: "Client project", text: "Multitenant web application for searching and booking accommodation." },
-        items: [
-          "Backend features with ASP.NET Core/.NET and frontend interfaces and flows with React.",
-          "Designing and consuming REST APIs and integrating third-party services.",
-          "Gathering requirements and supporting interface design and user experience decisions.",
-          "Functional QA, cross-module testing and bug fixing.",
-        ],
-        stack: ["ASP.NET Core", ".NET", "React", "Git"],
-        note: "Client names, source code and internal project details remain confidential.",
-      },
-      {
         org: "Universidad de La Guajira", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: UNIGUAJIRA_START,
         summary: "Working with the Vice-Rector’s Office for Teaching to support the development and technical evolution of the Ejercitador Saber Pro platform on an existing codebase.",
         project: { label: "Institutional project", text: "Ejercitador Saber Pro", slug: "ejercitador-saber-pro" },
@@ -383,6 +372,19 @@ const en: typeof es = {
         ],
         stack: ["Django", "FastAPI", "React", "MySQL"],
         note: "The Ejercitador Saber Pro repository is private, so it has no public link.",
+      },
+      {
+        org: "ALGORITHM S.A.S.", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: "2026-06-01", end: "2026-10-01",
+        summary: "Building and evolving web applications for company clients, with ASP.NET Core/.NET on the backend and React on the frontend: QA and stabilization of existing solutions, and the full development cycle of a new application, now in its testing phase.",
+        project: { label: "Client project", text: "Multitenant web application for searching and booking accommodation." },
+        items: [
+          "Backend features with ASP.NET Core/.NET and frontend interfaces and flows with React.",
+          "Designing and consuming REST APIs and integrating third-party services.",
+          "Gathering requirements and supporting interface design and user experience decisions.",
+          "Functional QA, cross-module testing and bug fixing.",
+        ],
+        stack: ["ASP.NET Core", ".NET", "React", "Git"],
+        note: "Client names, source code and internal project details remain confidential.",
       },
     ] as Job[],
   },

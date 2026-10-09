@@ -239,9 +239,9 @@ export function Experience() {
           <Reveal as="article" key={job.org} className={`grid gap-8 md:grid-cols-12 ${ji > 0 ? "mt-20 border-t border-border pt-16 md:mt-28 md:pt-20" : ""}`}>
             <div className="md:col-span-4">
               <div className="font-mono text-xs text-muted-foreground">
-                {job.start ? <><time dateTime={job.start.slice(0, 7)}>{monthYear(job.start)}</time> – {e.present}</> : e.present}
+                {job.start ? <><time dateTime={job.start.slice(0, 7)}>{monthYear(job.start)}</time> – {job.end ? <time dateTime={job.end.slice(0, 7)}>{monthYear(job.end)}</time> : e.present}</> : e.present}
               </div>
-              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{e.current}</span>
+              {!job.end && <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{e.current}</span>}
             </div>
             <div className="md:col-span-8">
               <h3 className="text-[clamp(2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em] text-balance">{job.org}</h3>
