@@ -122,12 +122,12 @@ export function ProjectLinks({ project, primary = false, compact = false }: { pr
   const px = compact ? "px-4" : "px-5";
   return (
     <>
-      <a href={project.links.demo} target="_blank" rel="noopener noreferrer" className={primary
+      <a href={project.links.demo} target="_blank" rel="noopener noreferrer" data-umami-event="demo" data-umami-event-project={project.slug} className={primary
         ? `group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary ${px} text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]`
         : `group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`}>
         {p.demo}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {project.name} {p.newTab}</span>
       </a>
-      <a href={project.links.repo} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`}>
+      <a href={project.links.repo} target="_blank" rel="noopener noreferrer" data-umami-event="repo" data-umami-event-project={project.slug} className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`}>
         <Github className="h-4 w-4" aria-hidden="true" />{p.github}<span className="sr-only">: {project.name} {p.newTab}</span>
       </a>
     </>
@@ -477,6 +477,7 @@ export function Contact() {
     setErrs(n); setOk(false);
     if (Object.keys(n).length) { (e.currentTarget.querySelector(`[name=${Object.keys(n)[0]}]`) as HTMLElement)?.focus(); return; }
     setOk(true);
+    window.umami?.track("contact-form");
     window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(`${c.subject} — ${name}`)}&body=${encodeURIComponent(msg + "\n\n" + email)}`;
   };
   const serviceIcons = [Layers, Server, Rocket];
@@ -507,7 +508,7 @@ export function Contact() {
               </ul>
             </Reveal>
             <Reveal delay={80}>
-              <a href={`mailto:${CONTACT.email}`} className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">{t.hero.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></a>
+              <a href={`mailto:${CONTACT.email}`} data-umami-event="email" className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">{t.hero.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></a>
               <ul className="mt-10 flex flex-wrap gap-2">
                 {socials.map(({ I, l, h, external }) => (
                   <li key={l}>
@@ -517,7 +518,7 @@ export function Contact() {
                   </li>
                 ))}
                 <li>
-                  <a href={t.cv.href} download className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
+                  <a href={t.cv.href} download data-umami-event="cv-download" data-umami-event-from="contact" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
                     <Download className="h-4 w-4" aria-hidden="true" />{t.cv.label}<span className="sr-only"> {t.cv.hint}</span>
                   </a>
                 </li>

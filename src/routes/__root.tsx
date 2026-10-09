@@ -128,6 +128,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 // the theme class and <meta name="theme-color"> come from the saved theme, so neither flashes the wrong color.
 const themeScript = `(function(){var d=document.documentElement,t;d.classList.add('js');try{t=localStorage.getItem('theme')}catch(e){}var dark=t!=='light';if(dark)d.classList.add('dark');var m=document.createElement('meta');m.name='theme-color';m.content=dark?'${THEME_COLORS.dark}':'${THEME_COLORS.light}';document.head.appendChild(m)})()`;
 
+// Visit stats with Umami (cookieless, no consent banner). Off unless VITE_UMAMI_WEBSITE_ID is set at build time
+// (Railway service variable); data-domains limits counting to the public site, so previews and local runs don't count.
+// Page changes inside the app are counted automatically; links marked data-umami-event count as events.
+const UMAMI_WEBSITE_ID = import.meta.env.VITE_UMAMI_WEBSITE_ID;
+
 function RootShell({ children }: { children: ReactNode }) {
   // Server-render the right <html lang>; the client keeps it in sync afterwards.
   const lang = useLang();
@@ -136,6 +141,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />
+        {UMAMI_WEBSITE_ID && <script defer src="https://cloud.umami.is/script.js" data-website-id={UMAMI_WEBSITE_ID} data-domains={new URL(SITE_URL).hostname} />}
       </head>
       <body>
         {children}

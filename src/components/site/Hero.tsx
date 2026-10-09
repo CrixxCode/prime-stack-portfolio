@@ -146,7 +146,7 @@ export function Hero() {
             <a href="#projects" className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-border-strong px-6 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
               {h.cta2}<ArrowDownRight className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
             </a>
-            <a href={t.cv.href} download className="inline-flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+            <a href={t.cv.href} download data-umami-event="cv-download" data-umami-event-from="hero" className="inline-flex min-h-12 items-center gap-2 rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               <Download className="h-4 w-4" />{t.cv.label}<span className="sr-only"> {t.cv.hint}</span>
             </a>
           </div>

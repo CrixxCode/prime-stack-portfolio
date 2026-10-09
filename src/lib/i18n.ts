@@ -25,6 +25,8 @@ type Project = {
   /** Real screenshots in /public/projects/<name>/ (e.g. { src: "/projects/wayra/dashboard.webp", thumb, alt, width, height }).
    *  The first one is shown large; with more than one, thumbnails switch between them. While empty, the generated mockup is shown. */
   shots?: { src: string; thumb: string; alt: string; width: number; height: number }[];
+  /** Share preview for the case study page (Open Graph / X), 1200×630 in /public. Without it, the site-wide one is used. */
+  shareImage?: { path: string; width: number; height: number };
 };
 
 /** A blog article. Add `url` once it is published: only then the card links to it and shows "Read article". */
@@ -64,6 +66,8 @@ type Job = {
 const UNIGUAJIRA_START: string | null = "2026-09-01";
 
 const WAYRA_LINKS = { demo: "https://wayra-travel.com/", repo: "https://github.com/CrixxCode/wayra-gh" };
+// Cropped from dashboard.webp (top of the screenshot, scaled to 1200 wide)
+const WAYRA_SHARE = { path: "/projects/wayra/og.jpg", width: 1200, height: 630 };
 
 const es = {
   nav: { home: "Inicio", about: "Sobre mí", experience: "Experiencia", projects: "Proyectos", stack: "Stack", education: "Formación", github: "GitHub", contact: "Contacto", cta: "Hablemos", menu: "Menú", close: "Cerrar", label: "Principal", skip: "Saltar al contenido", switchLang: "Cambiar idioma a inglés", toLight: "Cambiar a modo claro", toDark: "Cambiar a modo oscuro" },
@@ -106,7 +110,7 @@ const es = {
         concepts: ["REST", "RBAC", "Multitenancy", "Diseño relacional"],
         decision: { title: "Aislamiento multitenant", text: "La plataforma separa la información por establecimiento para evitar cruces de datos entre organizaciones, complementando esta separación con control de acceso basado en roles y recursos." },
         status: "En fase de pruebas",
-        links: WAYRA_LINKS,
+        links: WAYRA_LINKS, shareImage: WAYRA_SHARE,
         shots: [
           { src: "/projects/wayra/dashboard.webp", thumb: "/projects/wayra/dashboard-thumb.webp", width: 1440, height: 1000,
             alt: "Dashboard de Wayra Travel con ocupación, ingresos del día, huéspedes, RevPAR y gráficas de ocupación semanal e ingresos diarios (datos de demostración)." },
@@ -296,7 +300,7 @@ const en: typeof es = {
         concepts: ["REST", "RBAC", "Multitenancy", "Relational design"],
         decision: { title: "Multitenant isolation", text: "The platform separates data by property to prevent information from crossing organizational boundaries, complementing this isolation with role- and resource-based access control." },
         status: "Testing phase",
-        links: WAYRA_LINKS,
+        links: WAYRA_LINKS, shareImage: WAYRA_SHARE,
         shots: [
           { src: "/projects/wayra/dashboard.webp", thumb: "/projects/wayra/dashboard-thumb.webp", width: 1440, height: 1000,
             alt: "Wayra Travel dashboard with occupancy, today’s revenue, guests, RevPAR and charts of weekly occupancy and daily revenue (demo data)." },

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- One entry per page, each with its Spanish and English versions (?lang=).
+     Add a project's case study here when adding the project (src/test/app-routing.test.tsx checks it). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://cristianramirez.up.railway.app/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cristianramirez.up.railway.app/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cristianramirez.up.railway.app/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cristianramirez.up.railway.app/"/>
+  </url>
+  <url>
+    <loc>https://cristianramirez.up.railway.app/proyectos/wayra-travel</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cristianramirez.up.railway.app/proyectos/wayra-travel?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cristianramirez.up.railway.app/proyectos/wayra-travel?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cristianramirez.up.railway.app/proyectos/wayra-travel"/>
+  </url>
+  <url>
+    <loc>https://cristianramirez.up.railway.app/proyectos/ejercitador-saber-pro</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cristianramirez.up.railway.app/proyectos/ejercitador-saber-pro?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cristianramirez.up.railway.app/proyectos/ejercitador-saber-pro?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cristianramirez.up.railway.app/proyectos/ejercitador-saber-pro"/>
+  </url>
+</urlset>

@@ -20,6 +20,8 @@ export const Route = createFileRoute("/proyectos/$slug")({
     const path = `${SITE_URL}/proyectos/${project.slug}`;
     // Canonical URL per language version (?lang=), plus hreflang alternates, as on the home page
     const url = match.search.lang ? `${path}?lang=${match.search.lang}` : path;
+    // Replaces the site-wide share image (same property names win over the root's) when the project has its own
+    const image = project.shareImage;
     return {
       meta: [
         { title },
@@ -28,6 +30,13 @@ export const Route = createFileRoute("/proyectos/$slug")({
         { property: "og:description", content: project.desc },
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
+        ...(image ? [
+          { property: "og:image", content: `${SITE_URL}${image.path}` },
+          { property: "og:image:width", content: String(image.width) },
+          { property: "og:image:height", content: String(image.height) },
+          { property: "og:image:alt", content: title },
+          { name: "twitter:image", content: `${SITE_URL}${image.path}` },
+        ] : []),
       ],
       links: [
         { rel: "canonical", href: url },
