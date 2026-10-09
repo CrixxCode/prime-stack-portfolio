@@ -1,6 +1,6 @@
 // Builds the CV as PDF in Spanish and English: `node cv/build.mjs`
 // Content comes from src/lib/i18n.ts (the same source as the site, so both always agree);
-// only what the site doesn't show (tutoring, courses, languages) lives in CV_EXTRA below.
+// only what the site doesn't show (courses, languages) lives in CV_EXTRA below.
 // Each version is rendered as HTML and printed to PDF with the local Chrome (no extra dependencies).
 import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
@@ -30,8 +30,6 @@ const CV_EXTRA = {
         "Refactorización de componentes de la arquitectura existente.",
       ] },
     ],
-    tutor: { org: "Universidad de La Guajira", role: "Tutor Estudiantil", period: "2022 – 2026",
-      text: "Apoyo académico en fundamentos de programación, algoritmos, estructuras de datos, bases de datos y desarrollo web." },
     projectRole: "Desarrollo conjunto en un equipo de dos: requisitos, arquitectura, modelado de datos, backend, frontend, autenticación y autorización (RBAC), multitenancy, pruebas, documentación y despliegue.",
     more: "Más proyectos en",
     saber: "Saber Pro: puntaje global 188 · Inglés 181",
@@ -60,8 +58,6 @@ const CV_EXTRA = {
         "Refactoring components of the existing architecture.",
       ] },
     ],
-    tutor: { org: "Universidad de La Guajira", role: "Student Tutor", period: "2022 – 2026",
-      text: "Academic support in programming fundamentals, algorithms, data structures, databases and web development." },
     projectRole: "Built jointly in a two-developer team: requirements, architecture, data modeling, backend, frontend, authentication and authorization (RBAC), multitenancy, testing, documentation and deployment.",
     more: "More projects at",
     saber: "Saber Pro: overall score 188 · English 181",
@@ -102,7 +98,7 @@ function render(lang) {
     meta: esc(job.mode ?? ""),
     period: `${job.start ? monthYear(job.start) : ""} – ${t.experience.present}`,
     body: list(x.jobs[i]?.bullets ?? []),
-  })).join("") + entry({ title: esc(x.tutor.role), org: esc(x.tutor.org), period: x.tutor.period, body: `<p>${esc(x.tutor.text)}</p>` });
+  })).join("") + (eng.role ? entry({ title: esc(eng.role.t), org: esc(eng.school), period: eng.role.period, body: `<p>${esc(eng.role.d)}</p>` }) : "");
 
   const project = entry({
     title: `${esc(wayra.name)} <span class="tag">${esc(wayra.status)}</span>`,

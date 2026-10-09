@@ -40,7 +40,9 @@ type Repo = { name: string; type: string; desc: string; url: string; stack: stri
   featured?: boolean };
 
 /** A program in "Education & Achievements". `current` adds the "in progress" badge below the period. */
-type Program = { degree: string; school: string; period: string; current?: boolean; details: [string, string][] };
+type Program = { degree: string; school: string; period: string; current?: boolean; details: [string, string][];
+  /** A role held at the same school, shown in a box below the details (also used by the CV). */
+  role?: { t: string; period: string; d: string } };
 
 /** A competition result in "Education & Achievements". */
 type Achievement = { icon: "trophy" | "medal"; t: string; meta: string; result: string; d: string; org?: string };
@@ -187,7 +189,8 @@ const es = {
     num: "05", label: "Formación y logros", title: "Formación, resultados y crecimiento técnico.", currentL: "En curso",
     programs: [
       { degree: "Ingeniería de Sistemas", school: "Universidad de La Guajira", period: "2022 – Actualidad", current: true,
-        details: [["Semestre", "Décimo"], ["Graduación estimada", "Primer semestre de 2027"]] },
+        details: [["Semestre", "Décimo"], ["Graduación estimada", "Primer semestre de 2027"]],
+        role: { t: "Tutor Estudiantil", period: "2022 – 2026", d: "Apoyo académico en fundamentos de programación, algoritmos, estructuras de datos, bases de datos y desarrollo web." } },
       { degree: "Técnico en Sistemas", school: "SENA", period: "2020 – 2021", details: [["Estado", "Finalizado"]] },
     ] as Program[],
     interestsL: "Intereses", interests: ["Arquitectura de software", "Ingeniería de software", "Desarrollo de productos digitales", "Inteligencia Artificial"],
@@ -376,7 +379,8 @@ const en: typeof es = {
     num: "05", label: "Education & Achievements", title: "Education, results and technical growth.", currentL: "In progress",
     programs: [
       { degree: "Systems Engineering", school: "Universidad de La Guajira", period: "2022 – Present", current: true,
-        details: [["Semester", "Tenth"], ["Expected graduation", "First half of 2027"]] },
+        details: [["Semester", "Tenth"], ["Expected graduation", "First half of 2027"]],
+        role: { t: "Student Tutor", period: "2022 – 2026", d: "Academic support in programming fundamentals, algorithms, data structures, databases and web development." } },
       { degree: "Systems Technician", school: "SENA", period: "2020 – 2021", details: [["Status", "Completed"]] },
     ],
     interestsL: "Interests", interests: ["Software Architecture", "Software Engineering", "Digital Product Development", "Artificial Intelligence"],

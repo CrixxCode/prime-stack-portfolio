@@ -292,6 +292,16 @@ export function Education() {
               <dl className="mt-6 flex flex-wrap gap-x-12 gap-y-4">
                 {pr.details.map(([k, v]) => <div key={k}><dt className="text-sm text-muted-foreground">{k}</dt><dd className="mt-1">{v}</dd></div>)}
               </dl>
+              {/* Same box as the project in Experience */}
+              {pr.role && (
+                <div className="mt-6 max-w-2xl rounded-xl border border-border bg-surface p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h4 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{pr.role.t}</h4>
+                    <span className="font-mono text-xs text-muted-foreground">{pr.role.period}</span>
+                  </div>
+                  <p className="mt-1.5 text-[15px]">{pr.role.d}</p>
+                </div>
+              )}
             </div>
           </Reveal>
         ))}
