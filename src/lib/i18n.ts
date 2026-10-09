@@ -37,7 +37,11 @@ type Repo = { name: string; type: string; desc: string; url: string; stack: stri
   /** Secondary labels (concepts, testing, CI) shown apart from the stack, only when the repo documents them. */
   extra?: string[];
   /** The main repository gets more visual weight. */
-  featured?: boolean };
+  featured?: boolean;
+  /** Top-level folders as [folder, what it holds], drawn as a file tree. Real folders of the repository only. */
+  tree?: [string, string][];
+  /** Slug of the matching case study, linked next to the repository button. */
+  slug?: string };
 
 /** A program in "Education & Achievements". `current` adds the "in progress" badge below the period. */
 type Program = { degree: string; school: string; period: string; current?: boolean; details: [string, string][];
@@ -210,12 +214,19 @@ const es = {
   github: {
     num: "06", label: "GitHub", title: "Código que también cuenta la historia.",
     intro: "Mantengo repositorios públicos de proyectos personales, académicos y ejercicios técnicos donde documento parte de mi trabajo y evolución como desarrollador.",
-    cta: "Ver repositorio", profileCta: "Ver perfil en GitHub", newTab: "(se abre en una pestaña nueva)",
+    cta: "Ver repositorio", profileCta: "Ver perfil en GitHub", newTab: "(se abre en una pestaña nueva)", treeL: "Estructura del repositorio",
     activityTitle: "Actividad en el último año", contributionsL: "contribuciones", reposL: "repositorios públicos", less: "Menos", more: "Más", source: "Datos públicos de GitHub · se actualizan a diario",
     repos: [
       { name: "Wayra Travel", type: "Producto SaaS", featured: true, url: "https://github.com/CrixxCode/wayra-gh",
         desc: "Código fuente del SaaS multitenant de gestión hotelera.",
-        stack: ["Django", "Angular", "PostgreSQL", "Docker"] },
+        stack: ["Django", "Angular", "PostgreSQL", "Docker"], slug: "wayra-travel",
+        tree: [
+          ["backend/", "Django · cuentas, roles y permisos (RBAC)"],
+          ["frontend/", "Angular · Tailwind"],
+          ["diagramas/", "Arquitectura, modelo de datos, ciclo de reserva"],
+          ["docs/", "Manual de usuario, runbook de producción, despliegue"],
+          [".github/", "CI: pruebas, validación de OpenAPI, lint y build"],
+        ] },
       { name: "Sistema de gestión para laboratorio clínico", type: "Proyecto académico", url: "https://github.com/CrixxCode/ProyectoLabClinico",
         desc: "Aplicación full-stack desarrollada como proyecto académico para gestionar procesos relacionados con pacientes, médicos, órdenes, exámenes, muestras y resultados.",
         stack: ["Node.js", "TypeScript", "Express", "Angular"] },
@@ -400,12 +411,20 @@ const en: typeof es = {
   github: {
     num: "06", label: "GitHub", title: "Code that also tells the story.",
     intro: "I keep public repositories for personal projects, academic work and technical exercises that document part of my work and growth as a developer.",
-    cta: "View Repository", profileCta: "View GitHub Profile", newTab: "(opens in a new tab)",
+    cta: "View Repository", profileCta: "View GitHub Profile", newTab: "(opens in a new tab)", treeL: "Repository structure",
     activityTitle: "Activity in the last year", contributionsL: "contributions", reposL: "public repositories", less: "Less", more: "More", source: "Public GitHub data · refreshed daily",
     repos: [
       { name: "Wayra Travel", type: "SaaS product", featured: true, url: "https://github.com/CrixxCode/wayra-gh",
         desc: "Source code for the multitenant hotel management SaaS.",
-        stack: ["Django", "Angular", "PostgreSQL", "Docker"] },
+        stack: ["Django", "Angular", "PostgreSQL", "Docker"], slug: "wayra-travel",
+        // Folder names are the repository's own (some in Spanish)
+        tree: [
+          ["backend/", "Django · accounts, roles and permissions (RBAC)"],
+          ["frontend/", "Angular · Tailwind"],
+          ["diagramas/", "Architecture, data model, booking lifecycle"],
+          ["docs/", "User manual, production runbook, deployment"],
+          [".github/", "CI: tests, OpenAPI validation, lint and build"],
+        ] },
       { name: "Clinical laboratory management system", type: "Academic project", url: "https://github.com/CrixxCode/ProyectoLabClinico",
         desc: "Full-stack application developed as an academic project to manage workflows related to patients, physicians, orders, exams, samples and results.",
         stack: ["Node.js", "TypeScript", "Express", "Angular"] },

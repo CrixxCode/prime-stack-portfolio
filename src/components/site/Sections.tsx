@@ -369,6 +369,25 @@ function ActivityMap({ days, label }: { days: GithubActivity["days"]; label: str
   );
 }
 
+/** Top-level folders of a repository, drawn like `tree`. The folder column has a fixed width (mono font) so descriptions
+ *  line up; on phones each description goes below its folder instead. */
+function RepoTree({ name, tree, label }: { name: string; tree: [string, string][]; label: string }) {
+  return (
+    <div className="mt-6 rounded-xl border border-border bg-surface p-4 font-mono text-xs leading-relaxed md:p-5">
+      <p translate="no">{name}/</p>
+      <ul aria-label={label}>
+        {tree.map(([dir, d], i) => (
+          <li key={dir} className="grid grid-cols-[3.5ch_1fr] gap-x-1 py-0.5 sm:grid-cols-[3.5ch_11ch_1fr]">
+            <span className="text-muted-foreground" aria-hidden="true">{i === tree.length - 1 ? "└──" : "├──"}</span>
+            <span translate="no" className="text-primary">{dir}</span>
+            <span className="col-start-2 text-muted-foreground sm:col-start-auto">{d}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function GitHubPanel() {
   const { t, lang } = useSite(); const g = t.github;
   // Fetched after the page renders (the section is far below the fold); hidden if GitHub can't be reached
@@ -425,12 +444,18 @@ export function GitHubPanel() {
                 <p className={`mt-3 text-muted-foreground ${r.featured ? "text-base md:text-lg" : "text-sm"}`}>{r.desc}</p>
                 <div className="mt-5 flex flex-wrap gap-1.5">{r.stack.map((x) => <Tag key={x}>{x}</Tag>)}</div>
                 {r.extra && <p className="mt-3 text-sm text-muted-foreground">{r.extra.join(" · ")}</p>}
-                <div className="mt-auto pt-6">
+                {r.tree && <RepoTree name={r.url.split("/").pop() ?? r.name} tree={r.tree} label={g.treeL} />}
+                <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-6">
                   <a href={r.url} target="_blank" rel="noopener noreferrer" className={r.featured
                     ? "group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]"
                     : "group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]"}>
                     {g.cta}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {r.name} {g.newTab}</span>
                   </a>
+                  {r.slug && (
+                    <Link to="/proyectos/$slug" params={{ slug: r.slug }} search={{ lang }} className="group inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+                      {t.projects.caseStudy}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {r.name}</span>
+                    </Link>
+                  )}
                 </div>
               </article>
             </Reveal>
