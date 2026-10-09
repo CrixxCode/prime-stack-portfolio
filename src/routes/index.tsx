@@ -1,11 +1,11 @@
 import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import { SiteProvider } from "@/lib/site";
-import type { Lang } from "@/lib/i18n";
+import { parseLangSearch, type Lang } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/brand";
 import { Nav } from "@/components/site/Nav";
 import { Hero } from "@/components/site/Hero";
 import { BrandBanner } from "@/components/site/Brand";
-import { About, Projects, Stack, Experience, Education, GitHubPanel, Services, Blog, Contact, Footer } from "@/components/site/Sections";
+import { About, Projects, Stack, Experience, Education, GitHubPanel, Blog, Contact, Footer } from "@/components/site/Sections";
 
 const title = "Cristian Ramirez — Full-Stack Developer";
 const descriptions: Record<Lang, string> = {
@@ -14,11 +14,7 @@ const descriptions: Record<Lang, string> = {
 };
 
 export const Route = createFileRoute("/")({
-  // ?lang=en|es makes the language linkable (e.g. send the English version to a recruiter)
-  validateSearch: (search: Record<string, unknown>): { lang?: Lang } => {
-    const lang = search["lang"];
-    return lang === "en" || lang === "es" ? { lang } : {};
-  },
+  validateSearch: parseLangSearch,
   head: ({ match, matches }) => {
     const detected = (matches[0]?.loaderData as { lang?: Lang } | undefined)?.lang;
     const description = descriptions[match.search.lang ?? detected ?? "es"];
@@ -62,7 +58,6 @@ function Index() {
         <Stack />
         <Education />
         <GitHubPanel />
-        <Services />
         <Blog />
         <Contact />
       </main>
