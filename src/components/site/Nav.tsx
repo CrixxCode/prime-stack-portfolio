@@ -74,7 +74,7 @@ export function Nav({ onHome = true }: { onHome?: boolean }) {
 
   return (
     <>
-    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">{t.nav.skip}</a>
+    <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">{t.nav.skip}</a>
     <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
       <nav aria-label={t.nav.label} className="flex w-full max-w-fit items-center gap-1 rounded-full border border-border-strong bg-nav p-1.5 shadow-soft backdrop-blur-xl">
         <SectionLink id="home" onHome={onHome} className="relative after:absolute after:-inset-x-0.5 after:-inset-y-1 mr-1 shrink-0 rounded-full" label={`${CONTACT.name} — ${t.nav.home}`}><BrandLogo /></SectionLink>

@@ -40,7 +40,7 @@ export function About() {
         </div>
         <Reveal focus delay={60} className="lg:col-span-4 lg:col-start-9">
           <img src="/foto-personal.jpeg" alt={a.photoAlt} width={785} height={1177} loading="lazy" decoding="async"
-            className="block aspect-[4/5] w-full rounded-xl border border-border-strong bg-surface object-cover object-[50%_20%]" />
+            className="block aspect-4/5 w-full rounded-xl border border-border-strong bg-surface object-cover object-[50%_20%]" />
         </Reveal>
       </div>
       <Reveal className="mt-20 border-y border-border py-10 md:mt-28 md:py-14">
@@ -108,7 +108,7 @@ export function ProjectVisual({ project, index, gallery = false }: { project: Pr
       {shots?.length ? (
         <Shots shots={shots} label={p.showShot} />
       ) : (
-        <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]"><Mock label={`${p.mock}: ${project.name}`} /></div>
+        <div className="mt-5 h-75 sm:h-95 md:h-110"><Mock label={`${p.mock}: ${project.name}`} /></div>
       )}
     </div>
   );
@@ -410,7 +410,7 @@ export function GitHubPanel() {
               <div className="h-3 w-40 rounded bg-surface-2" />
               <div className="h-14 w-48 rounded bg-surface-2" />
             </div>
-            <div className="mt-6 aspect-[686/88] w-full rounded bg-surface-2" />
+            <div className="mt-6 aspect-686/88 w-full rounded bg-surface-2" />
             <div className="mt-4 h-4" />
           </div>
         )}
@@ -588,7 +588,7 @@ export function Footer() {
     <footer className="border-t border-border">
       <div className="container-x flex flex-col gap-6 py-10 text-sm md:flex-row md:items-center md:justify-between">
         <div>
-          <BrandHorizontal className="w-[220px]" />
+          <BrandHorizontal className="w-55" />
           <p className="mt-3 font-mono text-xs text-muted-foreground">{t.footer.tagline}</p>
         </div>
         <ul className="flex flex-wrap items-center gap-1 text-muted-foreground">
