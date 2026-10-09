@@ -1,7 +1,10 @@
 export type Lang = "es" | "en";
 
-/** A featured project. Optional fields render only when present, so each project shows what it has. */
+/** A featured project. The home page shows a summary (desc, first features, stack, status); the full case study
+ *  lives at /proyectos/<slug>. Optional fields render only when present, so each project shows what it has. */
 type Project = {
+  /** URL segment of the case study page; the same in both languages. */
+  slug: string;
   name: string; tag: string; desc: string; features: string[]; stack: string[]; status: string;
   problem?: string;
   /** Institutional or business context of the project. */
@@ -22,6 +25,8 @@ type Project = {
   /** Real screenshots in /public/projects/<name>/ (e.g. { src: "/projects/wayra/dashboard.webp", thumb, alt, width, height }).
    *  The first one is shown large; with more than one, thumbnails switch between them. While empty, the generated mockup is shown. */
   shots?: { src: string; thumb: string; alt: string; width: number; height: number }[];
+  /** Share preview for the case study page (Open Graph / X), 1200×630 in /public. Without it, the site-wide one is used. */
+  shareImage?: { path: string; width: number; height: number };
 };
 
 /** A blog article. Add `url` once it is published: only then the card links to it and shows "Read article". */
@@ -32,10 +37,16 @@ type Repo = { name: string; type: string; desc: string; url: string; stack: stri
   /** Secondary labels (concepts, testing, CI) shown apart from the stack, only when the repo documents them. */
   extra?: string[];
   /** The main repository gets more visual weight. */
-  featured?: boolean };
+  featured?: boolean;
+  /** Top-level folders as [folder, what it holds], drawn as a file tree. Real folders of the repository only. */
+  tree?: [string, string][];
+  /** Slug of the matching case study, linked next to the repository button. */
+  slug?: string };
 
 /** A program in "Education & Achievements". `current` adds the "in progress" badge below the period. */
-type Program = { degree: string; school: string; period: string; current?: boolean; details: [string, string][] };
+type Program = { degree: string; school: string; period: string; current?: boolean; details: [string, string][];
+  /** A role held at the same school, shown in a box below the details (also used by the CV). */
+  role?: { t: string; period: string; d: string } };
 
 /** A competition result in "Education & Achievements". */
 type Achievement = { icon: "trophy" | "medal"; t: string; meta: string; result: string; d: string; org?: string };
@@ -49,14 +60,13 @@ type Job = {
   org: string; role: string; summary: string; items: string[]; stack: string[];
   /** ISO date (YYYY-MM-DD); null while the real start date is not known (only "Present" is shown). */
   start: string | null;
+  /** ISO date of the end; without it the job is current ("Present" and the "Current" badge). Only month and year are shown. */
+  end?: string;
   /** Contract type, e.g. "Prestación de servicios" / "Independent contractor". */
   mode?: string;
-  /** Kinds of work done (shown after the summary). */
-  work?: string;
-  /** The project worked on, in a highlighted box. Client work stays anonymized (no client or product names). */
-  project?: { label: string; text: string };
-  /** Practices and concepts, shown as plain text apart from the stack. */
-  concepts?: string[];
+  /** The project worked on, in a highlighted box. Client work stays anonymized (no client or product names).
+   *  `slug` links the box to that project's case study instead of repeating it here. */
+  project?: { label: string; text: string; slug?: string };
   note?: string;
 };
 
@@ -64,6 +74,8 @@ type Job = {
 const UNIGUAJIRA_START: string | null = "2026-09-01";
 
 const WAYRA_LINKS = { demo: "https://wayra-travel.com/", repo: "https://github.com/CrixxCode/wayra-gh" };
+// Cropped from dashboard.webp (top of the screenshot, scaled to 1200 wide)
+const WAYRA_SHARE = { path: "/projects/wayra/og.jpg", width: 1200, height: 630 };
 
 const es = {
   nav: { home: "Inicio", about: "Sobre mí", experience: "Experiencia", projects: "Proyectos", stack: "Stack", education: "Formación", github: "GitHub", contact: "Contacto", cta: "Hablemos", menu: "Menú", close: "Cerrar", label: "Principal", skip: "Saltar al contenido", switchLang: "Cambiar idioma a inglés", toLight: "Cambiar a modo claro", toDark: "Cambiar a modo oscuro" },
@@ -78,7 +90,7 @@ const es = {
     num: "03", label: "Sobre mí", title: "Ingeniería con criterio de producto.",
     p1: "Me gusta involucrarme en un producto desde antes de escribir la primera línea de código. Entender el problema, levantar requisitos, diseñar la solución y tomar decisiones sobre arquitectura, datos e interfaz forma parte de mi manera de desarrollar.",
     p2: "Trabajo tanto en frontend como en backend y disfruto especialmente los problemas que conectan ambas partes: arquitectura, APIs, modelos de datos y experiencias de usuario coherentes.",
-    p3: "Django + Angular es mi stack principal, pero no defino mi trabajo por un framework. Me interesa construir fundamentos sólidos que pueda trasladar entre tecnologías y seguir creciendo hacia la arquitectura de software.",
+    p3: "Me interesa seguir creciendo hacia la arquitectura de software.",
     quote: "Las herramientas cambian. La capacidad para construir soluciones no.",
     photoAlt: "Retrato en blanco y negro de Cristian Ramirez",
   },
@@ -93,9 +105,10 @@ const es = {
     problem: "Problema", features: "Funciones clave", stack: "Stack", status: "Estado", mock: "Maqueta de la interfaz", showShot: "Ver captura",
     context: "Contexto", myRole: "Mi rol", work: "Trabajo técnico",
     origin: "Origen", participation: "Mi participación", concepts: "Conceptos aplicados", decision: "Decisión técnica", demo: "Ver demo", github: "GitHub", newTab: "(se abre en una pestaña nueva)",
+    caseStudy: "Ver caso de estudio", caseStudyL: "Caso de estudio", allProjects: "Todos los proyectos", nextProject: "Siguiente proyecto",
     items: [
       {
-        name: "Wayra Travel", tag: "SaaS · Hospitality Tech · Full-Stack",
+        slug: "wayra-travel", name: "Wayra Travel", tag: "SaaS · Hospitality Tech · Full-Stack",
         desc: "SaaS multitenant para centralizar y gestionar la operación de establecimientos de alojamiento desde una única plataforma.",
         origin: "Surgió a partir de un proyecto académico y evolucionó posteriormente como producto SaaS.",
         problem: "Muchos establecimientos gestionan reservas, huéspedes, habitaciones, pagos, inventario y otros procesos mediante información distribuida entre hojas de cálculo, registros físicos y herramientas independientes, dificultando la consistencia, trazabilidad y consulta de los datos.",
@@ -105,7 +118,7 @@ const es = {
         concepts: ["REST", "RBAC", "Multitenancy", "Diseño relacional"],
         decision: { title: "Aislamiento multitenant", text: "La plataforma separa la información por establecimiento para evitar cruces de datos entre organizaciones, complementando esta separación con control de acceso basado en roles y recursos." },
         status: "En fase de pruebas",
-        links: WAYRA_LINKS,
+        links: WAYRA_LINKS, shareImage: WAYRA_SHARE,
         shots: [
           { src: "/projects/wayra/dashboard.webp", thumb: "/projects/wayra/dashboard-thumb.webp", width: 1440, height: 1000,
             alt: "Dashboard de Wayra Travel con ocupación, ingresos del día, huéspedes, RevPAR y gráficas de ocupación semanal e ingresos diarios (datos de demostración)." },
@@ -120,7 +133,7 @@ const es = {
         ],
       },
       {
-        name: "Ejercitador Saber Pro", tag: "EdTech · Universidad de La Guajira · Full-Stack",
+        slug: "ejercitador-saber-pro", name: "Ejercitador Saber Pro", tag: "EdTech · Universidad de La Guajira · Full-Stack",
         desc: "Plataforma institucional orientada a la preparación, entrenamiento y evaluación de competencias genéricas de las pruebas Saber Pro.",
         context: "Proyecto de la Vicerrectoría de Docencia de la Universidad de La Guajira orientado al fortalecimiento de las competencias genéricas evaluadas en las pruebas Saber Pro.",
         roleTitle: "Desarrollador Full-Stack Jr. · Prestación de servicios",
@@ -143,7 +156,7 @@ const es = {
       { name: "Herramientas", items: [["Docker", ""], ["Git", ""], ["Postman", ""], ["WSL", ""], ["Railway", ""]] },
     ] as StackGroup[],
     fundamentalsTitle: "Fundamentos transferibles",
-    fundamentalsText: "Trabajo sobre fundamentos que se mantienen entre tecnologías: HTTP, APIs, modelado relacional, componentes, estado, autenticación, autorización y separación de responsabilidades. Eso me permite moverme entre distintos stacks sin depender exclusivamente de un framework.",
+    fundamentalsText: "HTTP, APIs, modelado relacional, componentes, estado, autenticación, autorización y separación de responsabilidades: lo que se mantiene igual cuando cambia el framework.",
     conceptsTitle: "Conceptos aplicados",
     concepts: ["REST", "RBAC", "Multitenancy", "Monolito modular", "Clean Architecture", "MVC", "Diseño relacional"],
   },
@@ -151,40 +164,30 @@ const es = {
     num: "02", label: "Experiencia", title: "Donde aplico lo que sé.", present: "Actualidad", current: "Actual",
     jobs: [
       {
-        org: "ALGORITHM S.A.S.", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: "2026-06-01",
-        summary: "Participo en el desarrollo y evolución de aplicaciones web para clientes de la compañía, trabajando tanto en backend con ASP.NET Core/.NET como en frontend con React.",
-        work: "Mi trabajo ha incluido QA y estabilización de soluciones existentes, además de participación en el ciclo completo de desarrollo de una nueva aplicación actualmente en fase de pruebas.",
-        project: { label: "Proyecto para cliente", text: "Aplicación web multitenant orientada a la búsqueda y reserva de alojamientos." },
-        items: [
-          "Desarrollo y mantenimiento de funcionalidades backend con ASP.NET Core/.NET.",
-          "Desarrollo de interfaces y flujos frontend con React.",
-          "Diseño y consumo de APIs REST.",
-          "Integración con servicios y APIs de terceros.",
-          "Levantamiento, análisis y refinamiento de requerimientos.",
-          "Diseño de interfaces y apoyo en decisiones de experiencia de usuario.",
-          "Ejecución de QA funcional y pruebas transversales.",
-          "Detección, análisis y corrección de errores.",
-        ],
-        stack: ["ASP.NET Core", ".NET", "React", "Git"],
-        concepts: ["APIs REST", "Integraciones", "QA"],
-        note: "Los nombres, código y detalles internos de proyectos desarrollados para clientes se mantienen confidenciales.",
-      },
-      {
         org: "Universidad de La Guajira", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: UNIGUAJIRA_START,
-        summary: "Vinculado a la Vicerrectoría de Docencia de la Universidad de La Guajira para apoyar el desarrollo y evolución técnica del Ejercitador Saber Pro.",
-        work: "Trabajo como desarrollador Full-Stack sobre una base de código existente, con foco en QA, pruebas, corrección de errores y refactorización.",
-        project: { label: "Proyecto institucional", text: "Ejercitador Saber Pro: plataforma orientada a la preparación, entrenamiento y evaluación de competencias genéricas de las pruebas Saber Pro." },
+        summary: "Vinculado a la Vicerrectoría de Docencia para apoyar el desarrollo y la evolución técnica del Ejercitador Saber Pro sobre una base de código existente.",
+        project: { label: "Proyecto institucional", text: "Ejercitador Saber Pro", slug: "ejercitador-saber-pro" },
         items: [
-          "QA funcional y técnico del sistema.",
-          "Ejecución de pruebas transversales entre módulos.",
+          "QA funcional y técnico, con pruebas transversales entre módulos.",
           "Detección, documentación y corrección de errores.",
           "Revisión de flujos existentes y validación de comportamiento.",
           "Refactorización de componentes de la arquitectura existente.",
-          "Apoyo en la evolución técnica y funcional del producto.",
         ],
         stack: ["Django", "FastAPI", "React", "MySQL"],
-        concepts: ["QA", "Pruebas", "Refactorización"],
         note: "El repositorio del Ejercitador Saber Pro es privado, por eso no tiene enlace público.",
+      },
+      {
+        org: "ALGORITHM S.A.S.", role: "Desarrollador Full-Stack Jr.", mode: "Prestación de servicios", start: "2026-06-01", end: "2026-10-01",
+        summary: "Desarrollo y evolución de aplicaciones web para clientes de la compañía, con ASP.NET Core/.NET en el backend y React en el frontend: QA y estabilización de soluciones existentes, y el ciclo completo de una nueva aplicación, que al cierre de mi contrato estaba en fase de pruebas.",
+        project: { label: "Proyecto para cliente", text: "Aplicación web multitenant orientada a la búsqueda y reserva de alojamientos." },
+        items: [
+          "Funcionalidades backend con ASP.NET Core/.NET e interfaces y flujos frontend con React.",
+          "Diseño y consumo de APIs REST e integración con servicios de terceros.",
+          "Levantamiento de requerimientos y apoyo en diseño de interfaces y experiencia de usuario.",
+          "QA funcional, pruebas transversales y corrección de errores.",
+        ],
+        stack: ["ASP.NET Core", ".NET", "React", "Git"],
+        note: "Los nombres, código y detalles internos de proyectos desarrollados para clientes se mantienen confidenciales.",
       },
     ] as Job[],
   },
@@ -192,7 +195,8 @@ const es = {
     num: "05", label: "Formación y logros", title: "Formación, resultados y crecimiento técnico.", currentL: "En curso",
     programs: [
       { degree: "Ingeniería de Sistemas", school: "Universidad de La Guajira", period: "2022 – Actualidad", current: true,
-        details: [["Semestre", "Décimo"], ["Graduación estimada", "Primer semestre de 2027"]] },
+        details: [["Semestre", "Décimo"], ["Graduación estimada", "Primer semestre de 2027"]],
+        role: { t: "Tutor Estudiantil", period: "2022 – 2026", d: "Apoyo académico en fundamentos de programación, algoritmos, estructuras de datos, bases de datos y desarrollo web." } },
       { degree: "Técnico en Sistemas", school: "SENA", period: "2020 – 2021", details: [["Estado", "Finalizado"]] },
     ] as Program[],
     interestsL: "Intereses", interests: ["Arquitectura de software", "Ingeniería de software", "Desarrollo de productos digitales", "Inteligencia Artificial"],
@@ -212,12 +216,19 @@ const es = {
   github: {
     num: "06", label: "GitHub", title: "Código que también cuenta la historia.",
     intro: "Mantengo repositorios públicos de proyectos personales, académicos y ejercicios técnicos donde documento parte de mi trabajo y evolución como desarrollador.",
-    cta: "Ver repositorio", profileCta: "Ver perfil en GitHub", newTab: "(se abre en una pestaña nueva)",
+    cta: "Ver repositorio", profileCta: "Ver perfil en GitHub", newTab: "(se abre en una pestaña nueva)", treeL: "Estructura del repositorio",
     activityTitle: "Actividad en el último año", contributionsL: "contribuciones", reposL: "repositorios públicos", less: "Menos", more: "Más", source: "Datos públicos de GitHub · se actualizan a diario",
     repos: [
       { name: "Wayra Travel", type: "Producto SaaS", featured: true, url: "https://github.com/CrixxCode/wayra-gh",
-        desc: "Repositorio del SaaS de gestión hotelera que evolucionó a partir de un proyecto académico y que actualmente se encuentra en fase de pruebas.",
-        stack: ["Django", "Angular", "PostgreSQL", "Docker"], extra: ["RBAC", "Multitenancy"] },
+        desc: "Código fuente del SaaS multitenant de gestión hotelera.",
+        stack: ["Django", "Angular", "PostgreSQL", "Docker"], slug: "wayra-travel",
+        tree: [
+          ["backend/", "Django · cuentas, roles y permisos (RBAC)"],
+          ["frontend/", "Angular · Tailwind"],
+          ["diagramas/", "Arquitectura, modelo de datos, ciclo de reserva"],
+          ["docs/", "Manual de usuario, runbook de producción, despliegue"],
+          [".github/", "CI: pruebas, validación de OpenAPI, lint y build"],
+        ] },
       { name: "Sistema de gestión para laboratorio clínico", type: "Proyecto académico", url: "https://github.com/CrixxCode/ProyectoLabClinico",
         desc: "Aplicación full-stack desarrollada como proyecto académico para gestionar procesos relacionados con pacientes, médicos, órdenes, exámenes, muestras y resultados.",
         stack: ["Node.js", "TypeScript", "Express", "Angular"] },
@@ -226,13 +237,8 @@ const es = {
         stack: ["ASP.NET Core", "Angular", "SQL Server", "Docker"], extra: ["Testing", "GitHub Actions"] },
     ] as Repo[],
   },
-  services: { num: "07", label: "Cómo puedo aportar", cta: "Hablemos de tu proyecto", items: [
-    { t: "Desarrollo Full-Stack", d: "Construcción y evolución de aplicaciones web, participando desde los requisitos y el diseño técnico hasta frontend, backend y pruebas." },
-    { t: "Análisis y apoyo técnico", d: "Apoyo en análisis de requerimientos, modelado de datos, diseño de APIs, revisión técnica y mejora de soluciones existentes." },
-    { t: "Colaboración en productos", d: "Integración a equipos y proyectos en desarrollo para implementar funcionalidades, realizar QA, corregir problemas y continuar la evolución técnica del producto." },
-  ] },
   blog: {
-    num: "08", label: "Blog", title: "Notas sobre lo que construyo y aprendo.",
+    num: "07", label: "Blog", title: "Notas sobre lo que construyo y aprendo.",
     intro: "Espacio para documentar decisiones técnicas, arquitectura, datos y aprendizajes surgidos durante el desarrollo de productos y proyectos reales.",
     read: "Leer artículo", newTab: "(se abre en una pestaña nueva)",
     posts: [
@@ -245,7 +251,13 @@ const es = {
     ] as Post[],
   },
   contact: {
-    num: "09", label: "Contacto", title: "Construyamos algo juntos.", text: "Estoy disponible para proyectos, colaboraciones y oportunidades donde pueda aportar desde el desarrollo Full-Stack y seguir creciendo como ingeniero de software.",
+    num: "08", label: "Contacto", title: "Construyamos algo juntos.", text: "Estoy disponible para proyectos, colaboraciones y oportunidades donde pueda aportar desde el desarrollo Full-Stack y seguir creciendo como ingeniero de software.",
+    servicesL: "Cómo puedo aportar",
+    services: [
+      { t: "Desarrollo Full-Stack", d: "Aplicaciones web desde los requisitos hasta frontend, backend y pruebas." },
+      { t: "Análisis y apoyo técnico", d: "Requerimientos, modelado de datos, diseño de APIs y revisión técnica." },
+      { t: "Colaboración en productos", d: "Integrarme a equipos en marcha para implementar, hacer QA y corregir problemas." },
+    ],
     remote: "Disponible para trabajo remoto", subject: "Portafolio", newTab: "(se abre en una pestaña nueva)",
     name: "Nombre", email: "Email", message: "Mensaje", send: "Enviar mensaje",
     errName: "Escribe tu nombre.", errEmail: "Escribe un email válido.", errMsg: "El mensaje debe tener al menos 10 caracteres.", ok: "Se abrirá tu cliente de correo para completar el envío.", okFallback: "¿No se abrió? Escríbeme directamente a",
@@ -276,7 +288,7 @@ const en: typeof es = {
     num: "03", label: "About", title: "Engineering with product judgment.",
     p1: "I like getting involved in a product before the first line of code is written. Understanding the problem, gathering requirements, designing the solution, and making decisions about architecture, data and interfaces are all part of how I approach development.",
     p2: "I work across both frontend and backend, and I especially enjoy problems that connect the two: architecture, APIs, data models and coherent user experiences.",
-    p3: "Django + Angular is my primary stack, but I don’t define my work by a framework. I focus on building solid fundamentals that transfer across technologies while continuing to grow toward software architecture.",
+    p3: "I want to keep growing toward software architecture.",
     quote: "Tools change. The ability to build solutions doesn’t.",
     photoAlt: "Black-and-white portrait of Cristian Ramirez",
   },
@@ -291,9 +303,10 @@ const en: typeof es = {
     problem: "Problem", features: "Key features", stack: "Stack", status: "Status", mock: "Interface mockup", showShot: "Show screenshot",
     context: "Context", myRole: "My role", work: "Technical work",
     origin: "Origin", participation: "My contribution", concepts: "Applied concepts", decision: "Technical decision", demo: "View Demo", github: "GitHub", newTab: "(opens in a new tab)",
+    caseStudy: "View Case Study", caseStudyL: "Case study", allProjects: "All projects", nextProject: "Next project",
     items: [
       {
-        name: "Wayra Travel", tag: "SaaS · Hospitality Tech · Full-Stack",
+        slug: "wayra-travel", name: "Wayra Travel", tag: "SaaS · Hospitality Tech · Full-Stack",
         desc: "Multitenant SaaS for centralizing and managing lodging operations from a single platform.",
         origin: "Originally developed from an academic project and later evolved into a SaaS product.",
         problem: "Many properties manage bookings, guests, rooms, payments, inventory and other processes with information scattered across spreadsheets, paper records and disconnected tools, which makes data hard to keep consistent, trace and look up.",
@@ -303,7 +316,7 @@ const en: typeof es = {
         concepts: ["REST", "RBAC", "Multitenancy", "Relational design"],
         decision: { title: "Multitenant isolation", text: "The platform separates data by property to prevent information from crossing organizational boundaries, complementing this isolation with role- and resource-based access control." },
         status: "Testing phase",
-        links: WAYRA_LINKS,
+        links: WAYRA_LINKS, shareImage: WAYRA_SHARE,
         shots: [
           { src: "/projects/wayra/dashboard.webp", thumb: "/projects/wayra/dashboard-thumb.webp", width: 1440, height: 1000,
             alt: "Wayra Travel dashboard with occupancy, today’s revenue, guests, RevPAR and charts of weekly occupancy and daily revenue (demo data)." },
@@ -318,7 +331,7 @@ const en: typeof es = {
         ],
       },
       {
-        name: "Ejercitador Saber Pro", tag: "EdTech · Universidad de La Guajira · Full-Stack",
+        slug: "ejercitador-saber-pro", name: "Ejercitador Saber Pro", tag: "EdTech · Universidad de La Guajira · Full-Stack",
         desc: "Institutional platform focused on preparing, training and assessing the generic competencies evaluated in Colombia’s Saber Pro exams.",
         context: "Project led by the Vice-Rector’s Office for Teaching at Universidad de La Guajira to strengthen the generic competencies assessed in the Saber Pro exams.",
         roleTitle: "Junior Full-Stack Developer · Independent contractor",
@@ -340,7 +353,7 @@ const en: typeof es = {
       { name: "Tools", items: [["Docker", ""], ["Git", ""], ["Postman", ""], ["WSL", ""], ["Railway", ""]] },
     ] as StackGroup[],
     fundamentalsTitle: "Transferable fundamentals",
-    fundamentalsText: "I work from fundamentals that stay consistent across technologies: HTTP, APIs, relational data modeling, components, state, authentication, authorization and separation of concerns. That lets me move between different stacks without depending exclusively on a single framework.",
+    fundamentalsText: "HTTP, APIs, relational data modeling, components, state, authentication, authorization and separation of concerns: what stays the same when the framework changes.",
     conceptsTitle: "Applied concepts",
     concepts: ["REST", "RBAC", "Multitenancy", "Modular monolith", "Clean Architecture", "MVC", "Relational design"],
   },
@@ -348,40 +361,30 @@ const en: typeof es = {
     num: "02", label: "Experience", title: "Where I put it to work.", present: "Present", current: "Current",
     jobs: [
       {
-        org: "ALGORITHM S.A.S.", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: "2026-06-01",
-        summary: "I contribute to the development and evolution of web applications for company clients, working on backend development with ASP.NET Core/.NET and frontend development with React.",
-        work: "My work has included QA and stabilization of existing solutions, as well as taking part in the full development cycle of a new application that is currently in its testing phase.",
-        project: { label: "Client project", text: "Multitenant web application for searching and booking accommodation." },
-        items: [
-          "Building and maintaining backend features with ASP.NET Core/.NET.",
-          "Building frontend interfaces and flows with React.",
-          "Designing and consuming REST APIs.",
-          "Integrating third-party services and APIs.",
-          "Gathering, analyzing and refining requirements.",
-          "Designing interfaces and supporting user experience decisions.",
-          "Running functional QA and cross-module testing.",
-          "Detecting, analyzing and fixing bugs.",
-        ],
-        stack: ["ASP.NET Core", ".NET", "React", "Git"],
-        concepts: ["REST APIs", "Integrations", "QA"],
-        note: "Client names, source code and internal project details remain confidential.",
-      },
-      {
         org: "Universidad de La Guajira", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: UNIGUAJIRA_START,
-        summary: "Working with the Vice-Rector’s Office for Teaching at Universidad de La Guajira to support the development and technical evolution of the Ejercitador Saber Pro platform.",
-        work: "I work as a full-stack developer on an existing codebase, focusing on QA, testing, bug fixing and refactoring.",
-        project: { label: "Institutional project", text: "Ejercitador Saber Pro: a platform for preparing, training and assessing the generic competencies evaluated in Colombia’s Saber Pro exams." },
+        summary: "Working with the Vice-Rector’s Office for Teaching to support the development and technical evolution of the Ejercitador Saber Pro platform on an existing codebase.",
+        project: { label: "Institutional project", text: "Ejercitador Saber Pro", slug: "ejercitador-saber-pro" },
         items: [
-          "Functional and technical QA of the system.",
-          "Running cross-module tests.",
+          "Functional and technical QA, with cross-module testing.",
           "Detecting, documenting and fixing bugs.",
           "Reviewing existing flows and validating behavior.",
           "Refactoring components of the existing architecture.",
-          "Supporting the product’s technical and functional evolution.",
         ],
         stack: ["Django", "FastAPI", "React", "MySQL"],
-        concepts: ["QA", "Testing", "Refactoring"],
         note: "The Ejercitador Saber Pro repository is private, so it has no public link.",
+      },
+      {
+        org: "ALGORITHM S.A.S.", role: "Junior Full-Stack Developer", mode: "Independent contractor", start: "2026-06-01", end: "2026-10-01",
+        summary: "Building and evolving web applications for company clients, with ASP.NET Core/.NET on the backend and React on the frontend: QA and stabilization of existing solutions, and the full development cycle of a new application, which was in its testing phase when my contract ended.",
+        project: { label: "Client project", text: "Multitenant web application for searching and booking accommodation." },
+        items: [
+          "Backend features with ASP.NET Core/.NET and frontend interfaces and flows with React.",
+          "Designing and consuming REST APIs and integrating third-party services.",
+          "Gathering requirements and supporting interface design and user experience decisions.",
+          "Functional QA, cross-module testing and bug fixing.",
+        ],
+        stack: ["ASP.NET Core", ".NET", "React", "Git"],
+        note: "Client names, source code and internal project details remain confidential.",
       },
     ] as Job[],
   },
@@ -389,7 +392,8 @@ const en: typeof es = {
     num: "05", label: "Education & Achievements", title: "Education, results and technical growth.", currentL: "In progress",
     programs: [
       { degree: "Systems Engineering", school: "Universidad de La Guajira", period: "2022 – Present", current: true,
-        details: [["Semester", "Tenth"], ["Expected graduation", "First half of 2027"]] },
+        details: [["Semester", "Tenth"], ["Expected graduation", "First half of 2027"]],
+        role: { t: "Student Tutor", period: "2022 – 2026", d: "Academic support in programming fundamentals, algorithms, data structures, databases and web development." } },
       { degree: "Systems Technician", school: "SENA", period: "2020 – 2021", details: [["Status", "Completed"]] },
     ],
     interestsL: "Interests", interests: ["Software Architecture", "Software Engineering", "Digital Product Development", "Artificial Intelligence"],
@@ -409,12 +413,20 @@ const en: typeof es = {
   github: {
     num: "06", label: "GitHub", title: "Code that also tells the story.",
     intro: "I keep public repositories for personal projects, academic work and technical exercises that document part of my work and growth as a developer.",
-    cta: "View Repository", profileCta: "View GitHub Profile", newTab: "(opens in a new tab)",
+    cta: "View Repository", profileCta: "View GitHub Profile", newTab: "(opens in a new tab)", treeL: "Repository structure",
     activityTitle: "Activity in the last year", contributionsL: "contributions", reposL: "public repositories", less: "Less", more: "More", source: "Public GitHub data · refreshed daily",
     repos: [
       { name: "Wayra Travel", type: "SaaS product", featured: true, url: "https://github.com/CrixxCode/wayra-gh",
-        desc: "Repository for the hotel management SaaS that evolved from an academic project and is currently in its testing phase.",
-        stack: ["Django", "Angular", "PostgreSQL", "Docker"], extra: ["RBAC", "Multitenancy"] },
+        desc: "Source code for the multitenant hotel management SaaS.",
+        stack: ["Django", "Angular", "PostgreSQL", "Docker"], slug: "wayra-travel",
+        // Folder names are the repository's own (some in Spanish)
+        tree: [
+          ["backend/", "Django · accounts, roles and permissions (RBAC)"],
+          ["frontend/", "Angular · Tailwind"],
+          ["diagramas/", "Architecture, data model, booking lifecycle"],
+          ["docs/", "User manual, production runbook, deployment"],
+          [".github/", "CI: tests, OpenAPI validation, lint and build"],
+        ] },
       { name: "Clinical laboratory management system", type: "Academic project", url: "https://github.com/CrixxCode/ProyectoLabClinico",
         desc: "Full-stack application developed as an academic project to manage workflows related to patients, physicians, orders, exams, samples and results.",
         stack: ["Node.js", "TypeScript", "Express", "Angular"] },
@@ -423,13 +435,8 @@ const en: typeof es = {
         stack: ["ASP.NET Core", "Angular", "SQL Server", "Docker"], extra: ["Testing", "GitHub Actions"] },
     ] as Repo[],
   },
-  services: { num: "07", label: "How I can contribute", cta: "Let’s Talk About Your Project", items: [
-    { t: "Full-Stack Development", d: "Building and evolving web applications, contributing from requirements and technical design through frontend, backend and testing." },
-    { t: "Technical analysis & support", d: "Support with requirements analysis, data modeling, API design, technical reviews and improvements to existing solutions." },
-    { t: "Product collaboration", d: "Joining existing teams and products to implement features, perform QA, resolve issues and support the product’s continued technical evolution." },
-  ] },
   blog: {
-    num: "08", label: "Blog", title: "Notes on what I build and learn.",
+    num: "07", label: "Blog", title: "Notes on what I build and learn.",
     intro: "A space to document technical decisions, architecture, data and lessons learned while building real products and projects.",
     read: "Read Article", newTab: "(opens in a new tab)",
     posts: [
@@ -442,7 +449,13 @@ const en: typeof es = {
     ] as Post[],
   },
   contact: {
-    num: "09", label: "Contact", title: "Let’s build something together.", text: "I’m available for projects, collaborations and opportunities where I can contribute as a Full-Stack Developer while continuing to grow as a software engineer.",
+    num: "08", label: "Contact", title: "Let’s build something together.", text: "I’m available for projects, collaborations and opportunities where I can contribute as a Full-Stack Developer while continuing to grow as a software engineer.",
+    servicesL: "How I can contribute",
+    services: [
+      { t: "Full-Stack Development", d: "Web applications from requirements through frontend, backend and testing." },
+      { t: "Technical analysis & support", d: "Requirements, data modeling, API design and technical reviews." },
+      { t: "Product collaboration", d: "Joining teams mid-project to build features, run QA and fix issues." },
+    ],
     remote: "Available for remote work", subject: "Portfolio", newTab: "(opens in a new tab)",
     name: "Name", email: "Email", message: "Message", send: "Send Message",
     errName: "Please enter your name.", errEmail: "Please enter a valid email.", errMsg: "Message must be at least 10 characters.", ok: "Your email client will open so you can complete the message.", okFallback: "Didn’t open? Email me directly at",
@@ -460,6 +473,12 @@ const en: typeof es = {
 
 export const dict = { es, en };
 export type Dict = typeof es;
+
+/** Route `validateSearch`: ?lang=en|es makes the language linkable (e.g. send the English version to a recruiter). */
+export const parseLangSearch = (search: Record<string, unknown>): { lang?: Lang } => {
+  const lang = search["lang"];
+  return lang === "en" || lang === "es" ? { lang } : {};
+};
 
 export const CONTACT = {
   name: "Cristian Ramirez",

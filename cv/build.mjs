@@ -1,6 +1,6 @@
 // Builds the CV as PDF in Spanish and English: `node cv/build.mjs`
 // Content comes from src/lib/i18n.ts (the same source as the site, so both always agree);
-// only what the site doesn't show (tutoring, courses, languages) lives in CV_EXTRA below.
+// only what the site doesn't show (courses, languages) lives in CV_EXTRA below.
 // Each version is rendered as HTML and printed to PDF with the local Chrome (no extra dependencies).
 import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
@@ -17,21 +17,20 @@ const CV_EXTRA = {
   es: {
     headings: { profile: "Perfil", experience: "Experiencia", projects: "Proyecto destacado", education: "Formación", achievements: "Logros", stack: "Stack", concepts: "Conceptos", courses: "Cursos", languages: "Idiomas" },
     profile: "Full-Stack Developer enfocado en construir productos web de principio a fin: requisitos, arquitectura, datos, backend, frontend y experiencia de usuario. Mi stack principal es Django + Angular, con uso profesional de ASP.NET Core/.NET y React, y fundamentos que me permiten adaptarme a distintas tecnologías.",
-    jobs: [
-      { bullets: [
+    // Bullets per job, matched to the site's jobs by organization
+    jobs: {
+      "ALGORITHM S.A.S.": { bullets: [
         "Desarrollo de funcionalidades backend con ASP.NET Core/.NET e interfaces y flujos frontend con React.",
         "Diseño y consumo de APIs REST e integración con servicios y APIs de terceros.",
         "Levantamiento y refinamiento de requerimientos; apoyo en diseño de interfaces y experiencia de usuario.",
-        "QA funcional, pruebas transversales y corrección de errores; participación en el ciclo completo de una aplicación multitenant de reservas de alojamiento, en fase de pruebas.",
+        "QA funcional, pruebas transversales y corrección de errores; participación en el ciclo completo de una aplicación multitenant de reservas de alojamiento, en fase de pruebas al cierre del contrato.",
       ] },
-      { unit: "Vicerrectoría de Docencia", bullets: [
+      "Universidad de La Guajira": { unit: "Vicerrectoría de Docencia", bullets: [
         "Desarrollo y evolución técnica del Ejercitador Saber Pro sobre una base de código existente (Django, FastAPI, React, MySQL).",
         "QA funcional y técnico, pruebas transversales entre módulos y corrección de errores.",
         "Refactorización de componentes de la arquitectura existente.",
       ] },
-    ],
-    tutor: { org: "Universidad de La Guajira", role: "Tutor Estudiantil", period: "2022 – 2026",
-      text: "Apoyo académico en fundamentos de programación, algoritmos, estructuras de datos, bases de datos y desarrollo web." },
+    },
     projectRole: "Desarrollo conjunto en un equipo de dos: requisitos, arquitectura, modelado de datos, backend, frontend, autenticación y autorización (RBAC), multitenancy, pruebas, documentación y despliegue.",
     more: "Más proyectos en",
     saber: "Saber Pro: puntaje global 188 · Inglés 181",
@@ -47,21 +46,20 @@ const CV_EXTRA = {
   en: {
     headings: { profile: "Profile", experience: "Experience", projects: "Featured project", education: "Education", achievements: "Achievements", stack: "Stack", concepts: "Concepts", courses: "Courses", languages: "Languages" },
     profile: "Full-Stack Developer focused on building web products end to end: requirements, architecture, data, backend, frontend and user experience. My primary stack is Django + Angular, with professional use of ASP.NET Core/.NET and React, and fundamentals that let me adapt to different technologies.",
-    jobs: [
-      { bullets: [
+    // Bullets per job, matched to the site's jobs by organization
+    jobs: {
+      "ALGORITHM S.A.S.": { bullets: [
         "Building backend features with ASP.NET Core/.NET and frontend interfaces and flows with React.",
         "Designing and consuming REST APIs and integrating third-party services and APIs.",
         "Gathering and refining requirements; supporting interface design and user experience decisions.",
-        "Functional QA, cross-module testing and bug fixing; took part in the full development cycle of a multitenant accommodation booking application, now in testing.",
+        "Functional QA, cross-module testing and bug fixing; took part in the full development cycle of a multitenant accommodation booking application, in testing when the contract ended.",
       ] },
-      { unit: "Vice-Rector’s Office for Teaching", bullets: [
+      "Universidad de La Guajira": { unit: "Vice-Rector’s Office for Teaching", bullets: [
         "Development and technical evolution of the Ejercitador Saber Pro platform on an existing codebase (Django, FastAPI, React, MySQL).",
         "Functional and technical QA, cross-module testing and bug fixing.",
         "Refactoring components of the existing architecture.",
       ] },
-    ],
-    tutor: { org: "Universidad de La Guajira", role: "Student Tutor", period: "2022 – 2026",
-      text: "Academic support in programming fundamentals, algorithms, data structures, databases and web development." },
+    },
     projectRole: "Built jointly in a two-developer team: requirements, architecture, data modeling, backend, frontend, authentication and authorization (RBAC), multitenancy, testing, documentation and deployment.",
     more: "More projects at",
     saber: "Saber Pro: overall score 188 · English 181",
@@ -96,13 +94,13 @@ function render(lang) {
     </div>`;
   const list = (items) => `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>`;
 
-  const jobs = t.experience.jobs.map((job, i) => entry({
+  const jobs = t.experience.jobs.map((job) => { const extra = x.jobs[job.org]; return entry({
     title: esc(job.role),
-    org: esc(job.org) + (x.jobs[i]?.unit ? ` · ${esc(x.jobs[i].unit)}` : ""),
+    org: esc(job.org) + (extra?.unit ? ` · ${esc(extra.unit)}` : ""),
     meta: esc(job.mode ?? ""),
-    period: `${job.start ? monthYear(job.start) : ""} – ${t.experience.present}`,
-    body: list(x.jobs[i]?.bullets ?? []),
-  })).join("") + entry({ title: esc(x.tutor.role), org: esc(x.tutor.org), period: x.tutor.period, body: `<p>${esc(x.tutor.text)}</p>` });
+    period: `${job.start ? monthYear(job.start) : ""} – ${job.end ? monthYear(job.end) : t.experience.present}`,
+    body: list(extra?.bullets ?? []),
+  }); }).join("") + (eng.role ? entry({ title: esc(eng.role.t), org: esc(eng.school), period: eng.role.period, body: `<p>${esc(eng.role.d)}</p>` }) : "");
 
   const project = entry({
     title: `${esc(wayra.name)} <span class="tag">${esc(wayra.status)}</span>`,

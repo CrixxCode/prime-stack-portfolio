@@ -1,27 +1,27 @@
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { getGithubActivity, type GithubActivity } from "@/lib/github-activity";
-import { ArrowRight, ArrowUpRight, Award, Download, ShieldCheck, FolderGit2, Github, Instagram, Linkedin, Lock, Mail, Trophy, Medal, Server, Rocket, Layers } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Award, Download, FolderGit2, Github, Instagram, Linkedin, Lock, Mail, Trophy, Medal, Server, Rocket, Layers } from "lucide-react";
 import { Reveal, useSite } from "@/lib/site";
-import { CONTACT } from "@/lib/i18n";
+import { CONTACT, type Dict } from "@/lib/i18n";
 import { HotelMock, ExamMock } from "./Mocks";
 import { BrandHorizontal } from "./Brand";
 
 const titleClass = "max-w-3xl text-[clamp(2rem,4.6vw,3.75rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-balance";
 
-function Head({ num, label, title, labelIsHeading = false, className = "" }: { num: string; label: string; title?: string; labelIsHeading?: boolean; className?: string }) {
-  const Label = labelIsHeading ? "h2" : "span";
+function Head({ num, label, title, className = "" }: { num: string; label: string; title?: string; className?: string }) {
   return (
     <Reveal className={`mb-12 md:mb-16 ${className}`}>
       <div className="flex items-end gap-5 border-b border-border pb-5">
         <span className="font-mono text-[clamp(3rem,8vw,6.5rem)] font-medium leading-[0.8] tracking-tighter text-numeral" aria-hidden="true">{num}</span>
-        <Label className="pb-1 font-mono text-sm uppercase tracking-[0.14em] text-muted-foreground">{label}</Label>
+        <span className="pb-1 font-mono text-sm uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
       </div>
       {title && <h2 className={`mt-8 ${titleClass}`}>{title}</h2>}
     </Reveal>
   );
 }
-const Tag = ({ children, tone = "" }: { children: ReactNode; tone?: string }) => (
+export const Tag = ({ children, tone = "" }: { children: ReactNode; tone?: string }) => (
   <span translate="no" className={`inline-flex items-center rounded-md border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground ${tone}`}>{children}</span>
 );
 
@@ -66,7 +66,8 @@ export function About() {
   );
 }
 
-type Shot = NonNullable<ReturnType<typeof useSite>["t"]["projects"]["items"][number]["shots"]>[number];
+type ProjectItem = Dict["projects"]["items"][number];
+type Shot = NonNullable<ProjectItem["shots"]>[number];
 
 /** Screenshot viewer: the selected one large (at its real proportions, so nothing is cropped on phones),
  *  thumbnails below to switch when there are several. */
@@ -95,71 +96,82 @@ function Shots({ shots, label }: { shots: Shot[]; label: string }) {
   );
 }
 
+/** The project's framed visual. Real screenshots replace the mockup as soon as `shots` has entries (see Project in i18n.ts).
+ *  `gallery` shows every screenshot with thumbnails (case study page); otherwise only the first one (home page). */
+export function ProjectVisual({ project, index, gallery = false }: { project: ProjectItem; index: number; gallery?: boolean }) {
+  const p = useSite().t.projects;
+  const Mock = index % 2 ? ExamMock : HotelMock;
+  const shots = gallery ? project.shots : project.shots?.slice(0, 1);
+  return (
+    <div className="relative rounded-2xl border border-border bg-surface-2 p-4 md:p-8">
+      <div className="absolute left-4 top-4 font-mono text-[10px] text-muted-foreground md:left-8" aria-hidden="true">fig.0{index + 1}</div>
+      {shots?.length ? (
+        <Shots shots={shots} label={p.showShot} />
+      ) : (
+        <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]"><Mock label={`${p.mock}: ${project.name}`} /></div>
+      )}
+    </div>
+  );
+}
+
+/** Demo and repository links of a project; private projects have none. */
+export function ProjectLinks({ project, primary = false, compact = false }: { project: ProjectItem; primary?: boolean; compact?: boolean }) {
+  const p = useSite().t.projects;
+  if (!project.links) return null;
+  // Compact padding lets three buttons share one row in the home page's narrow column
+  const px = compact ? "px-4" : "px-5";
+  return (
+    <>
+      <a href={project.links.demo} target="_blank" rel="noopener noreferrer" data-umami-event="demo" data-umami-event-project={project.slug} className={primary
+        ? `group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary ${px} text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]`
+        : `group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`}>
+        {p.demo}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {project.name} {p.newTab}</span>
+      </a>
+      <a href={project.links.repo} target="_blank" rel="noopener noreferrer" data-umami-event="repo" data-umami-event-project={project.slug} className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`}>
+        <Github className="h-4 w-4" aria-hidden="true" />{p.github}<span className="sr-only">: {project.name} {p.newTab}</span>
+      </a>
+    </>
+  );
+}
+
+// How many features the home summary lists; the case study shows them all.
+const SUMMARY_FEATURES = 4;
+
 export function Projects() {
-  const { t } = useSite(); const p = t.projects;
+  const { t, lang } = useSite(); const p = t.projects;
   return (
     <section id="projects" className="border-t border-border bg-surface/40 py-24 md:py-36">
       <div className="container-x">
         <Head num={p.num} label={p.label} title={p.title} />
-        <div className="space-y-28 md:space-y-40">
-          {p.items.map((it, i) => {
-            const Mock = i % 2 ? ExamMock : HotelMock;
-            // Extended case studies are much taller than their visual: top-align and keep the visual in view while reading
-            const extended = Boolean(it.decision);
-            return (
-            <article key={it.name} className={`grid min-h-[80vh] gap-10 lg:grid-cols-12 lg:gap-14 ${extended ? "items-center lg:items-start" : "items-center"}`}>
-              <Reveal focus className={`lg:col-span-7 ${i % 2 ? "lg:order-2" : ""} ${extended ? "lg:sticky lg:top-28" : ""}`}>
-                <div className="relative rounded-2xl border border-border bg-surface-2 p-4 md:p-8">
-                  <div className="absolute left-4 top-4 font-mono text-[10px] text-muted-foreground md:left-8" aria-hidden="true">fig.0{i + 1}</div>
-                  {/* Real screenshots replace the mockup as soon as `shots` has entries (see Project in i18n.ts) */}
-                  {it.shots?.length ? (
-                    <Shots shots={it.shots} label={p.showShot} />
-                  ) : (
-                    <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]"><Mock label={`${p.mock}: ${it.name}`} /></div>
-                  )}
-                </div>
-              </Reveal>
+        {/* A summary per project; problem, contribution and technical decisions live on its case study page */}
+        <div className="space-y-24 md:space-y-36">
+          {p.items.map((it, i) => (
+            <article key={it.slug} className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
+              <Reveal focus className={`lg:col-span-7 ${i % 2 ? "lg:order-2" : ""}`}><ProjectVisual project={it} index={i} /></Reveal>
               <div className={`lg:col-span-5 ${i % 2 ? "lg:order-1" : ""}`}>
                 <Reveal><div className="font-mono text-xs text-muted-foreground">0{i + 1} / {it.tag}</div></Reveal>
                 <Reveal delay={30}><h3 className="mt-3 text-3xl font-semibold tracking-[-0.03em] md:text-5xl">{it.name}</h3></Reveal>
                 <Reveal delay={60}><p className="mt-4 text-lg text-muted-foreground">{it.desc}</p></Reveal>
                 <Reveal delay={90}>
-                  <dl className="mt-8 divide-y divide-border border-y border-border text-sm">
-                    {([[p.origin, it.origin], [p.context, it.context], [p.problem, it.problem], [p.myRole, it.roleTitle], [p.participation, it.participation]] as const).map(([k, v]) => v && (
-                      <div key={k} className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{k}</dt><dd>{v}</dd></div>
-                    ))}
-                    <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.features}</dt>
-                      <dd><ul className="grid gap-1 sm:grid-cols-2">{it.features.map((f) => <li key={f} className="flex gap-2"><span className="text-primary" aria-hidden="true">→</span>{f}</li>)}</ul></dd></div>
-                    <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.stack}</dt><dd className="flex flex-wrap gap-1.5">{it.stack.map((s) => <Tag key={s}>{s}</Tag>)}</dd></div>
-                    {/* Concepts are ideas, not tools: plain text instead of the stack's tags */}
-                    {it.concepts && <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.concepts}</dt><dd className="text-muted-foreground">{it.concepts.join(" · ")}</dd></div>}
-                    {it.work && <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.work}</dt><dd className="text-muted-foreground">{it.work.join(" · ")}</dd></div>}
-                    <div className="grid grid-cols-[110px_1fr] gap-4 py-3"><dt className="text-sm text-muted-foreground">{p.status}</dt><dd className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{it.status}</dd></div>
-                  </dl>
+                  <ul aria-label={p.features} className="mt-6 grid gap-1 text-sm sm:grid-cols-2">
+                    {it.features.slice(0, SUMMARY_FEATURES).map((f) => <li key={f} className="flex gap-2"><span className="text-primary" aria-hidden="true">→</span>{f}</li>)}
+                  </ul>
+                  <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <div className="flex flex-wrap gap-1.5">{it.stack.map((s) => <Tag key={s}>{s}</Tag>)}</div>
+                    <span className="flex items-center gap-2 text-sm text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" /><span className="sr-only">{p.status}: </span>{it.status}</span>
+                  </div>
                 </Reveal>
-                {it.decision && (
-                  <Reveal delay={105}>
-                    <div className="mt-6 rounded-xl border border-border bg-card p-5">
-                      <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground"><ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />{p.decision}</div>
-                      <h4 className="mt-2 text-base font-semibold">{it.decision.title}</h4>
-                      <p className="mt-1.5 text-sm text-muted-foreground">{it.decision.text}</p>
-                    </div>
-                  </Reveal>
-                )}
-                {it.links && (
-                  <Reveal delay={120}>
-                    <div className="mt-8 flex flex-wrap gap-3">
-                      <a href={it.links.demo} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">
-                        {p.demo}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {it.name} {p.newTab}</span>
-                      </a>
-                      <a href={it.links.repo} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-5 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
-                        <Github className="h-4 w-4" aria-hidden="true" />{p.github}<span className="sr-only">: {it.name} {p.newTab}</span>
-                      </a>
-                    </div>
-                  </Reveal>
-                )}
+                <Reveal delay={120}>
+                  <div className="mt-8 flex flex-wrap gap-2">
+                    <Link to="/proyectos/$slug" params={{ slug: it.slug }} search={{ lang }} className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">
+                      {p.caseStudy}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {it.name}</span>
+                    </Link>
+                    <ProjectLinks project={it} compact />
+                  </div>
+                </Reveal>
               </div>
-            </article>); })}
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -227,26 +239,30 @@ export function Experience() {
           <Reveal as="article" key={job.org} className={`grid gap-8 md:grid-cols-12 ${ji > 0 ? "mt-20 border-t border-border pt-16 md:mt-28 md:pt-20" : ""}`}>
             <div className="md:col-span-4">
               <div className="font-mono text-xs text-muted-foreground">
-                {job.start ? <><time dateTime={job.start.slice(0, 7)}>{monthYear(job.start)}</time> – {e.present}</> : e.present}
+                {job.start ? <><time dateTime={job.start.slice(0, 7)}>{monthYear(job.start)}</time> – {job.end ? <time dateTime={job.end.slice(0, 7)}>{monthYear(job.end)}</time> : e.present}</> : e.present}
               </div>
-              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" />{e.current}</span>
+              {!job.end && <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{e.current}</span>}
             </div>
             <div className="md:col-span-8">
               <h3 className="text-[clamp(2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em] text-balance">{job.org}</h3>
               <p className="mt-3 text-xl text-muted-foreground">{job.role}{job.mode && <> · {job.mode}</>}</p>
               <p className="mt-6 max-w-2xl text-[15px] leading-relaxed">{job.summary}</p>
-              {job.work && <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">{job.work}</p>}
               {job.project && (
                 <div className="mt-6 max-w-2xl rounded-xl border border-border bg-surface p-4">
                   <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{job.project.label}</div>
-                  <p className="mt-1.5 text-[15px]">{job.project.text}</p>
+                  {/* A featured project links to its case study instead of being described twice */}
+                  {job.project.slug ? (
+                    <Link to="/proyectos/$slug" params={{ slug: job.project.slug }} search={{ lang }} className="group mt-1.5 inline-flex min-h-11 flex-wrap items-center gap-x-2 text-[15px]">
+                      <span className="font-medium">{job.project.text}</span>
+                      <span className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors group-hover:text-foreground">· {t.projects.caseStudy}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" /></span>
+                    </Link>
+                  ) : <p className="mt-1.5 text-[15px]">{job.project.text}</p>}
                 </div>
               )}
               <ul className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
                 {job.items.map((x, i) => <li key={x} className="bg-background p-5 text-[15px]"><span className="mb-2 block font-mono text-[11px] text-muted-foreground" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>{x}</li>)}
               </ul>
               <div className="mt-6 flex flex-wrap gap-1.5">{job.stack.map((x) => <Tag key={x}>{x}</Tag>)}</div>
-              {job.concepts && <p className="mt-3 text-sm text-muted-foreground">{job.concepts.join(" · ")}</p>}
               {job.note && <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground"><Lock className="h-3.5 w-3.5 shrink-0" />{job.note}</p>}
             </div>
           </Reveal>
@@ -276,6 +292,16 @@ export function Education() {
               <dl className="mt-6 flex flex-wrap gap-x-12 gap-y-4">
                 {pr.details.map(([k, v]) => <div key={k}><dt className="text-sm text-muted-foreground">{k}</dt><dd className="mt-1">{v}</dd></div>)}
               </dl>
+              {/* Same box as the project in Experience */}
+              {pr.role && (
+                <div className="mt-6 max-w-2xl rounded-xl border border-border bg-surface p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h4 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{pr.role.t}</h4>
+                    <span className="font-mono text-xs text-muted-foreground">{pr.role.period}</span>
+                  </div>
+                  <p className="mt-1.5 text-[15px]">{pr.role.d}</p>
+                </div>
+              )}
             </div>
           </Reveal>
         ))}
@@ -343,6 +369,25 @@ function ActivityMap({ days, label }: { days: GithubActivity["days"]; label: str
   );
 }
 
+/** Top-level folders of a repository, drawn like `tree`. The folder column has a fixed width (mono font) so descriptions
+ *  line up; on phones each description goes below its folder instead. */
+function RepoTree({ name, tree, label }: { name: string; tree: [string, string][]; label: string }) {
+  return (
+    <div className="mt-6 rounded-xl border border-border bg-surface p-4 font-mono text-xs leading-relaxed md:p-5">
+      <p translate="no">{name}/</p>
+      <ul aria-label={label}>
+        {tree.map(([dir, d], i) => (
+          <li key={dir} className="grid grid-cols-[3.5ch_1fr] gap-x-1 py-0.5 sm:grid-cols-[3.5ch_11ch_1fr]">
+            <span className="text-muted-foreground" aria-hidden="true">{i === tree.length - 1 ? "└──" : "├──"}</span>
+            <span translate="no" className="text-primary">{dir}</span>
+            <span className="col-start-2 text-muted-foreground sm:col-start-auto">{d}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function GitHubPanel() {
   const { t, lang } = useSite(); const g = t.github;
   // Fetched after the page renders (the section is far below the fold); hidden if GitHub can't be reached
@@ -399,41 +444,24 @@ export function GitHubPanel() {
                 <p className={`mt-3 text-muted-foreground ${r.featured ? "text-base md:text-lg" : "text-sm"}`}>{r.desc}</p>
                 <div className="mt-5 flex flex-wrap gap-1.5">{r.stack.map((x) => <Tag key={x}>{x}</Tag>)}</div>
                 {r.extra && <p className="mt-3 text-sm text-muted-foreground">{r.extra.join(" · ")}</p>}
-                <div className="mt-auto pt-6">
+                {r.tree && <RepoTree name={r.url.split("/").pop() ?? r.name} tree={r.tree} label={g.treeL} />}
+                <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-6">
                   <a href={r.url} target="_blank" rel="noopener noreferrer" className={r.featured
                     ? "group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]"
                     : "group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]"}>
                     {g.cta}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {r.name} {g.newTab}</span>
                   </a>
+                  {r.slug && (
+                    <Link to="/proyectos/$slug" params={{ slug: r.slug }} search={{ lang }} className="group inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+                      {t.projects.caseStudy}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {r.name}</span>
+                    </Link>
+                  )}
                 </div>
               </article>
             </Reveal>
           ))}
         </div>
       </div>
-    </section>
-  );
-}
-
-export function Services() {
-  const { t } = useSite(); const s = t.services;
-  const icons = [Layers, Server, Rocket];
-  return (
-    <section id="services" className="container-x py-24 md:py-32">
-      <Head num={s.num} label={s.label} labelIsHeading />
-      <ul className="divide-y divide-border border-y border-border">
-        {s.items.map((x, i) => { const I = icons[i] ?? Layers; return (
-          <Reveal as="li" key={x.t} delay={i * 30} className="grid grid-cols-[auto_1fr] items-center gap-5 py-6 md:grid-cols-[60px_1fr_1fr] md:py-8">
-            <I className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-            <h3 className="text-xl font-semibold tracking-tight md:text-3xl">{x.t}</h3>
-            <p className="col-span-2 text-muted-foreground md:col-span-1">{x.d}</p>
-          </Reveal>); })}
-      </ul>
-      <Reveal className="mt-8 flex justify-end">
-        <a href="#contact" className="group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-5 text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
-          {s.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-        </a>
-      </Reveal>
     </section>
   );
 }
@@ -484,8 +512,10 @@ export function Contact() {
     setErrs(n); setOk(false);
     if (Object.keys(n).length) { (e.currentTarget.querySelector(`[name=${Object.keys(n)[0]}]`) as HTMLElement)?.focus(); return; }
     setOk(true);
+    window.umami?.track("contact-form");
     window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(`${c.subject} — ${name}`)}&body=${encodeURIComponent(msg + "\n\n" + email)}`;
   };
+  const serviceIcons = [Layers, Server, Rocket];
   const field = "mt-2 block w-full rounded-lg border border-input bg-background px-4 py-3 text-[15px] transition-colors placeholder:text-muted-foreground focus:border-primary aria-[invalid=true]:border-destructive";
   const socials = [
     { I: Mail, l: "Email", h: `mailto:${CONTACT.email}`, external: false },
@@ -502,8 +532,18 @@ export function Contact() {
           <div className="lg:col-span-7">
             <Reveal><h2 className="text-[clamp(2.6rem,7vw,6rem)] font-semibold leading-[0.95] tracking-[-0.045em] text-balance">{c.title}</h2></Reveal>
             <Reveal delay={50}><p className="mt-6 max-w-md text-lg text-muted-foreground">{c.text}</p></Reveal>
+            <Reveal delay={65} className="mt-10 max-w-xl">
+              <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">{c.servicesL}</h3>
+              <ul className="mt-4 divide-y divide-border border-y border-border">
+                {c.services.map((x, i) => { const I = serviceIcons[i] ?? Layers; return (
+                  <li key={x.t} className="grid grid-cols-[auto_1fr] gap-x-4 py-4">
+                    <I className="mt-0.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                    <div><h4 className="font-medium">{x.t}</h4><p className="mt-0.5 text-sm text-muted-foreground">{x.d}</p></div>
+                  </li>); })}
+              </ul>
+            </Reveal>
             <Reveal delay={80}>
-              <a href={`mailto:${CONTACT.email}`} className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">{t.hero.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></a>
+              <a href={`mailto:${CONTACT.email}`} data-umami-event="email" className="group mt-8 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]">{t.hero.cta}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></a>
               <ul className="mt-10 flex flex-wrap gap-2">
                 {socials.map(({ I, l, h, external }) => (
                   <li key={l}>
@@ -513,7 +553,7 @@ export function Contact() {
                   </li>
                 ))}
                 <li>
-                  <a href={t.cv.href} download className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
+                  <a href={t.cv.href} download data-umami-event="cv-download" data-umami-event-from="contact" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]">
                     <Download className="h-4 w-4" aria-hidden="true" />{t.cv.label}<span className="sr-only"> {t.cv.hint}</span>
                   </a>
                 </li>
