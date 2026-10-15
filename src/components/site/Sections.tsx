@@ -1,8 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { getGithubActivity, type GithubActivity } from "@/lib/github-activity";
-import { ArrowRight, ArrowUpRight, Award, Download, FolderGit2, Github, Instagram, Linkedin, Lock, Mail, Trophy, Medal, Server, Rocket, Layers } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Award, Download, FolderGit2, Github, Instagram, Linkedin, Lock, Mail, Play, Trophy, Medal, Server, Rocket, Layers } from "lucide-react";
 import { Reveal, useSite } from "@/lib/site";
 import { CONTACT, type Dict } from "@/lib/i18n";
 import { HotelMock, ExamMock } from "./Mocks";
@@ -40,7 +40,7 @@ export function About() {
         </div>
         <Reveal focus delay={60} className="lg:col-span-4 lg:col-start-9">
           <img src="/foto-personal.jpeg" alt={a.photoAlt} width={785} height={1177} loading="lazy" decoding="async"
-            className="block aspect-[4/5] w-full rounded-xl border border-border-strong bg-surface object-cover object-[50%_20%]" />
+            className="block aspect-4/5 w-full rounded-xl border border-border-strong bg-surface object-cover object-[50%_20%]" />
         </Reveal>
       </div>
       <Reveal className="mt-20 border-y border-border py-10 md:mt-28 md:py-14">
@@ -67,7 +67,8 @@ export function About() {
 }
 
 type ProjectItem = Dict["projects"]["items"][number];
-type Shot = NonNullable<ProjectItem["shots"]>[number];
+// A single image (the home cover) needs no thumbnail
+type Shot = Omit<NonNullable<ProjectItem["shots"]>[number], "thumb"> & { thumb?: string };
 
 /** Screenshot viewer: the selected one large (at its real proportions, so nothing is cropped on phones),
  *  thumbnails below to switch when there are several. */
@@ -80,13 +81,13 @@ function Shots({ shots, label }: { shots: Shot[]; label: string }) {
       <img key={shot.src} src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} loading="lazy" decoding="async"
         className="block h-auto w-full rounded-xl border border-border-strong bg-card" />
       {shots.length > 1 && (
-        // One row of equal thumbnails spanning the image's full width, whatever their number
-        <ul className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${shots.length}, minmax(0, 1fr))` }}>
+        // Rows of up to five equal thumbnails spanning the image's full width; thumbs are 288 wide, in the shot's proportions
+        <ul className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(shots.length, 5)}, minmax(0, 1fr))` }}>
           {shots.map((s, i) => (
             <li key={s.src}>
               <button type="button" onClick={() => setCurrent(i)} aria-pressed={i === current} aria-label={`${label} ${i + 1}: ${s.alt}`}
                 className={`block w-full overflow-hidden rounded-md border transition-[border-color,opacity,scale] active:scale-[0.97] ${i === current ? "border-primary" : "border-border-strong opacity-60 hover:opacity-100"}`}>
-                <img src={s.thumb} alt="" width={288} height={200} loading="lazy" decoding="async" className="block h-auto w-full" />
+                <img src={s.thumb ?? s.src} alt="" width={288} height={Math.round((288 * s.height) / s.width)} loading="lazy" decoding="async" className="block h-auto w-full" />
               </button>
             </li>
           ))}
@@ -97,36 +98,45 @@ function Shots({ shots, label }: { shots: Shot[]; label: string }) {
 }
 
 /** The project's framed visual. Real screenshots replace the mockup as soon as `shots` has entries (see Project in i18n.ts).
- *  `gallery` shows every screenshot with thumbnails (case study page); otherwise only the first one (home page). */
+ *  `gallery` shows every screenshot with thumbnails (case study page); otherwise the cover or the first one (home page). */
 export function ProjectVisual({ project, index, gallery = false }: { project: ProjectItem; index: number; gallery?: boolean }) {
   const p = useSite().t.projects;
   const Mock = index % 2 ? ExamMock : HotelMock;
-  const shots = gallery ? project.shots : project.shots?.slice(0, 1);
+  const shots: Shot[] | undefined = gallery ? project.shots : project.cover ? [project.cover] : project.shots?.slice(0, 1);
   return (
     <div className="relative rounded-2xl border border-border bg-surface-2 p-4 md:p-8">
       <div className="absolute left-4 top-4 font-mono text-[10px] text-muted-foreground md:left-8" aria-hidden="true">fig.0{index + 1}</div>
       {shots?.length ? (
         <Shots shots={shots} label={p.showShot} />
       ) : (
-        <div className="mt-5 h-[300px] sm:h-[380px] md:h-[440px]"><Mock label={`${p.mock}: ${project.name}`} /></div>
+        <div className="mt-5 h-75 sm:h-95 md:h-110"><Mock label={`${p.mock}: ${project.name}`} /></div>
       )}
     </div>
   );
 }
 
-/** Demo and repository links of a project; private projects have none. */
+/** Demo, video and repository links of a project; private projects have none. The video link goes to the case study's
+ *  player (it just scrolls there when already on it). */
 export function ProjectLinks({ project, primary = false, compact = false }: { project: ProjectItem; primary?: boolean; compact?: boolean }) {
-  const p = useSite().t.projects;
+  const { t, lang } = useSite(); const p = t.projects;
   if (!project.links) return null;
+  const { demo } = project.links;
   // Compact padding lets three buttons share one row in the home page's narrow column
   const px = compact ? "px-4" : "px-5";
+  const solid = `group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary ${px} text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]`;
+  const outline = `group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`;
   return (
     <>
-      <a href={project.links.demo} target="_blank" rel="noopener noreferrer" data-umami-event="demo" data-umami-event-project={project.slug} className={primary
-        ? `group inline-flex min-h-11 items-center gap-2 rounded-full bg-primary ${px} text-sm font-medium text-primary-foreground shadow-soft transition-transform hover:scale-[1.03] active:scale-[0.97]`
-        : `group inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`}>
-        {p.demo}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {project.name} {p.newTab}</span>
-      </a>
+      {demo && (
+        <a href={demo} target="_blank" rel="noopener noreferrer" data-umami-event="demo" data-umami-event-project={project.slug} className={primary ? solid : outline}>
+          {p.demo}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">: {project.name} {p.newTab}</span>
+        </a>
+      )}
+      {project.video && (
+        <Link to="/proyectos/$slug" params={{ slug: project.slug }} hash="video" search={{ lang }} data-umami-event="video" data-umami-event-project={project.slug} className={primary && !demo ? solid : outline}>
+          <Play className="h-4 w-4 fill-current" aria-hidden="true" />{p.watchVideo}<span className="sr-only">: {project.name}</span>
+        </Link>
+      )}
       <a href={project.links.repo} target="_blank" rel="noopener noreferrer" data-umami-event="repo" data-umami-event-project={project.slug} className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong ${px} text-sm font-medium transition-[background-color,scale] hover:bg-surface-2 active:scale-[0.97]`}>
         <Github className="h-4 w-4" aria-hidden="true" />{p.github}<span className="sr-only">: {project.name} {p.newTab}</span>
       </a>
@@ -154,7 +164,7 @@ export function Projects() {
                 <Reveal delay={60}><p className="mt-4 text-lg text-muted-foreground">{it.desc}</p></Reveal>
                 <Reveal delay={90}>
                   <ul aria-label={p.features} className="mt-6 grid gap-1 text-sm sm:grid-cols-2">
-                    {it.features.slice(0, SUMMARY_FEATURES).map((f) => <li key={f} className="flex gap-2"><span className="text-primary" aria-hidden="true">→</span>{f}</li>)}
+                    {(it.highlights ?? it.features).slice(0, SUMMARY_FEATURES).map((f) => <li key={f} className="flex gap-2"><span className="text-primary" aria-hidden="true">→</span>{f}</li>)}
                   </ul>
                   <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
                     <div className="flex flex-wrap gap-1.5">{it.stack.map((s) => <Tag key={s}>{s}</Tag>)}</div>
@@ -369,15 +379,16 @@ function ActivityMap({ days, label }: { days: GithubActivity["days"]; label: str
   );
 }
 
-/** Top-level folders of a repository, drawn like `tree`. The folder column has a fixed width (mono font) so descriptions
- *  line up; on phones each description goes below its folder instead. */
+/** Top-level folders of a repository, drawn like `tree`. The folder column is as wide as the longest folder (mono font)
+ *  so descriptions line up; on phones each description goes below its folder instead. */
 function RepoTree({ name, tree, label }: { name: string; tree: [string, string][]; label: string }) {
+  const dirWidth = `${Math.max(...tree.map(([dir]) => dir.length)) + 1}ch`;
   return (
     <div className="mt-6 rounded-xl border border-border bg-surface p-4 font-mono text-xs leading-relaxed md:p-5">
       <p translate="no">{name}/</p>
-      <ul aria-label={label}>
+      <ul aria-label={label} style={{ "--dir": dirWidth } as CSSProperties}>
         {tree.map(([dir, d], i) => (
-          <li key={dir} className="grid grid-cols-[3.5ch_1fr] gap-x-1 py-0.5 sm:grid-cols-[3.5ch_11ch_1fr]">
+          <li key={dir} className="grid grid-cols-[3.5ch_1fr] gap-x-1 py-0.5 sm:grid-cols-[3.5ch_var(--dir)_1fr]">
             <span className="text-muted-foreground" aria-hidden="true">{i === tree.length - 1 ? "└──" : "├──"}</span>
             <span translate="no" className="text-primary">{dir}</span>
             <span className="col-start-2 text-muted-foreground sm:col-start-auto">{d}</span>
@@ -410,7 +421,7 @@ export function GitHubPanel() {
               <div className="h-3 w-40 rounded bg-surface-2" />
               <div className="h-14 w-48 rounded bg-surface-2" />
             </div>
-            <div className="mt-6 aspect-[686/88] w-full rounded bg-surface-2" />
+            <div className="mt-6 aspect-686/88 w-full rounded bg-surface-2" />
             <div className="mt-4 h-4" />
           </div>
         )}
@@ -431,7 +442,7 @@ export function GitHubPanel() {
             </div>
           </div>
         )}
-        {/* Real public repositories only: no stars or forks. The featured one spans both rows on large screens. */}
+        {/* Real public repositories only: no stars or forks. Featured ones span two rows on large screens. */}
         <div className="grid gap-4 lg:grid-cols-2">
           {g.repos.map((r, i) => (
             <Reveal key={r.url} delay={i * 40} className={r.featured ? "lg:row-span-2" : ""}>
@@ -588,7 +599,7 @@ export function Footer() {
     <footer className="border-t border-border">
       <div className="container-x flex flex-col gap-6 py-10 text-sm md:flex-row md:items-center md:justify-between">
         <div>
-          <BrandHorizontal className="w-[220px]" />
+          <BrandHorizontal className="w-55" />
           <p className="mt-3 font-mono text-xs text-muted-foreground">{t.footer.tagline}</p>
         </div>
         <ul className="flex flex-wrap items-center gap-1 text-muted-foreground">

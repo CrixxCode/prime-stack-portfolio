@@ -6,6 +6,12 @@ type Project = {
   /** URL segment of the case study page; the same in both languages. */
   slug: string;
   name: string; tag: string; desc: string; features: string[]; stack: string[]; status: string;
+  /** Short feature labels for the home summary when `features` are full sentences; without it, the first features are shown. */
+  highlights?: string[];
+  /** More on the status (what is done and what is missing), shown under it on the case study. */
+  statusDetail?: string;
+  /** Full stack as [area, technologies], shown on the case study instead of the `stack` tags (the home summary keeps those). */
+  stackGroups?: [string, string[]][];
   problem?: string;
   /** Institutional or business context of the project. */
   context?: string;
@@ -20,11 +26,17 @@ type Project = {
   work?: string[];
   /** A key technical decision, highlighted on its own. */
   decision?: { title: string; text: string };
-  /** Public links (demo / repository). Private projects simply omit them. */
-  links?: { demo: string; repo: string };
+  /** Public links (demo / repository). Private projects simply omit them; a project not deployed yet omits `demo`. */
+  links?: { demo?: string; repo: string };
+  /** YouTube demo video, embedded on the case study. `poster` is a local copy of its thumbnail (/public), so YouTube
+   *  only loads when the visitor presses play. */
+  video?: { id: string; poster: string };
   /** Real screenshots in /public/projects/<name>/ (e.g. { src: "/projects/wayra/dashboard.webp", thumb, alt, width, height }).
    *  The first one is shown large; with more than one, thumbnails switch between them. While empty, the generated mockup is shown. */
   shots?: { src: string; thumb: string; alt: string; width: number; height: number }[];
+  /** Image for the home summary instead of the first screenshot, when that one is too short for the card
+   *  (the others use 1440×1000, so the image is about as tall as the text beside it). */
+  cover?: { src: string; alt: string; width: number; height: number };
   /** Share preview for the case study page (Open Graph / X), 1200×630 in /public. Without it, the site-wide one is used. */
   shareImage?: { path: string; width: number; height: number };
 };
@@ -36,7 +48,7 @@ type Post = { title: string; status: string; desc: string; topics: string[]; url
 type Repo = { name: string; type: string; desc: string; url: string; stack: string[];
   /** Secondary labels (concepts, testing, CI) shown apart from the stack, only when the repo documents them. */
   extra?: string[];
-  /** The main repository gets more visual weight. */
+  /** Main repositories get more visual weight (two rows on large screens); keep them in pairs so the grid stays even. */
   featured?: boolean;
   /** Top-level folders as [folder, what it holds], drawn as a file tree. Real folders of the repository only. */
   tree?: [string, string][];
@@ -77,6 +89,17 @@ const WAYRA_LINKS = { demo: "https://wayra-travel.com/", repo: "https://github.c
 // Cropped from dashboard.webp (top of the screenshot, scaled to 1200 wide)
 const WAYRA_SHARE = { path: "/projects/wayra/og.jpg", width: 1200, height: 630 };
 
+// Not deployed yet: no demo link until it is on Railway
+const SKY_LINKS = { repo: "https://github.com/CrixxCode/sky-beauty-web" };
+const SKY_VIDEO = { id: "a73Mkd9Z-II", poster: "/projects/sky-beauty/video-poster.webp" };
+// Cropped from the top of the store's home page (scaled to 1200 wide)
+const SKY_SHARE = { path: "/projects/sky-beauty/og.jpg", width: 1200, height: 630 };
+// Home summary image: top of the product page, in the other projects' 1440×1000
+const SKY_COVER = { src: "/projects/sky-beauty/portada.webp", width: 1440, height: 1000 };
+// Screenshots, all 1440×810 (demo data)
+const skyShot = (name: string, alt: string) =>
+  ({ src: `/projects/sky-beauty/${name}.webp`, thumb: `/projects/sky-beauty/${name}-thumb.webp`, width: 1440, height: 810, alt });
+
 const es = {
   nav: { home: "Inicio", about: "Sobre mí", experience: "Experiencia", projects: "Proyectos", stack: "Stack", education: "Formación", github: "GitHub", contact: "Contacto", cta: "Hablemos", menu: "Menú", close: "Cerrar", label: "Principal", skip: "Saltar al contenido", switchLang: "Cambiar idioma a inglés", toLight: "Cambiar a modo claro", toDark: "Cambiar a modo oscuro" },
   hero: {
@@ -105,6 +128,7 @@ const es = {
     problem: "Problema", features: "Funciones clave", stack: "Stack", status: "Estado", mock: "Maqueta de la interfaz", showShot: "Ver captura",
     context: "Contexto", myRole: "Mi rol", work: "Trabajo técnico",
     origin: "Origen", participation: "Mi participación", concepts: "Conceptos aplicados", decision: "Decisión técnica", demo: "Ver demo", github: "GitHub", newTab: "(se abre en una pestaña nueva)",
+    video: "Video de demostración", watchVideo: "Ver video", play: "Reproducir video", youtube: "Ver en YouTube",
     caseStudy: "Ver caso de estudio", caseStudyL: "Caso de estudio", allProjects: "Todos los proyectos", nextProject: "Siguiente proyecto",
     items: [
       {
@@ -142,6 +166,51 @@ const es = {
         stack: ["Django", "FastAPI", "React", "MySQL"],
         work: ["QA", "Pruebas funcionales", "Refactorización", "Corrección de errores"],
         status: "En desarrollo",
+      },
+      {
+        slug: "sky-beauty", name: "Sky Beauty Maquillaje", tag: "E-commerce · Retail de belleza · Full-Stack",
+        desc: "Tienda virtual de maquillaje con pedidos por WhatsApp sin crear cuenta y un panel para gestionar catálogo, inventario, pedidos, pagos y envíos.",
+        context: "Proyecto para cliente: Sky Beauty Maquillaje, tienda de belleza en Colombia. Los requisitos se definieron con la propietaria del negocio.",
+        problem: "El negocio vendía sin un canal digital propio. Necesitaba mostrar su catálogo de forma ordenada, recibir pedidos sin obligar al cliente a crear una cuenta y seguir atendiendo por WhatsApp, su canal habitual. También necesitaba controlar las existencias por variante para no vender lo que no tiene. El sistema separa las etapas que suelen mezclarse al vender por chat: pedido registrado, confirmado, pago verificado, despachado y entregado.",
+        participation: "Desarrollo full-stack individual. Hice el levantamiento y la documentación de requisitos con la clienta, el modelo de datos, la API, la tienda y el panel, las pruebas automatizadas y el video de demostración.",
+        features: [
+          "Compra sin registro: el pedido se envía por WhatsApp con un mensaje que trae el resumen ya escrito.",
+          "Inventario por variante (tono, color, tamaño). Las existencias se reservan al crear el pedido y cada movimiento queda registrado.",
+          "Motor de promociones porcentuales o de valor fijo, por variante, producto o categoría, con fechas de vigencia y una regla de prioridad.",
+          "Panel con dos roles, propietaria y personal, cada uno con sus permisos.",
+          "Gestión de pedidos, verificación de pagos (transferencia, Nequi, Daviplata y contra entrega) y envíos con transportadora y número de guía.",
+          "Seguimiento del pedido con un enlace privado o con el código y el teléfono.",
+          "Cancelación automática: 48 h si el pedido sigue sin confirmar y 24 h si no llega el comprobante de pago. Las existencias se liberan.",
+          "Reportes de ventas, productos más vendidos y márgenes, con exportación a CSV.",
+          "Favoritos sin cuenta, página de ofertas y testimonios.",
+          "Departamentos y municipios oficiales del DANE. El pago contra entrega solo se ofrece en los municipios habilitados.",
+        ],
+        highlights: ["Pedidos por WhatsApp", "Inventario por variante", "Motor de promociones", "Panel con roles y permisos"],
+        stack: ["Next.js", "NestJS", "PostgreSQL", "Prisma"],
+        stackGroups: [
+          ["Frontend", ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "shadcn/ui", "TanStack Query", "Zustand", "React Hook Form + Zod"]],
+          ["Backend", ["NestJS 11", "Prisma 7", "PostgreSQL", "JWT + argon2", "sharp", "Swagger", "Pino"]],
+          ["Pruebas", ["Jest (unitarias e integración)", "Playwright (E2E en celular y escritorio)"]],
+          ["Infraestructura", ["Docker", "Railway (despliegue previsto)"]],
+        ],
+        concepts: ["API REST", "RBAC", "Sesiones revocables con JWT", "Transacciones y control de concurrencia (incremento atómico de stock, rechazo de ediciones simultáneas)", "Idempotencia", "Máquina de estados de pedidos", "Datos del pedido guardados como estaban al comprar", "Historial de precios y de promociones para calcular el precio en una fecha dada", "Tokens HMAC", "Límite de peticiones", "Tareas programadas", "Pruebas unitarias, de integración y E2E", "Diseño mobile-first"],
+        decision: { title: "Checkout idempotente con reserva atómica de existencias", text: "El pedido se crea en una sola transacción. En ella se recalculan en el servidor los precios y las promociones, se reservan las existencias de cada variante y se guarda una copia de los datos comerciales de ese momento. Cada intento de compra lleva una clave de idempotencia que el navegador conserva. Si el cliente reintenta, o si llegan dos peticiones a la vez, el servidor devuelve el mismo pedido y no reserva stock dos veces. Con eso no se venden unidades inexistentes y no se duplican pedidos en conexiones móviles inestables." },
+        status: "En fase de pruebas",
+        statusDetail: "De los 15 módulos del plan, 13 están terminados. El de contenido y páginas legales está construido, pero faltan los textos aprobados, y falta el despliegue en Railway.",
+        links: SKY_LINKS, video: SKY_VIDEO, shareImage: SKY_SHARE,
+        cover: { ...SKY_COVER, alt: "Detalle de un producto en la tienda Sky Beauty con precio en promoción, selector de tonos con la disponibilidad de cada variante y botón para agregar a la bolsa (datos de demostración)." },
+        shots: [
+          skyShot("inicio", "Página de inicio de la tienda Sky Beauty con el banner principal, el buscador, el menú de categorías y el botón de WhatsApp (datos de demostración)."),
+          skyShot("celular", "Tres pantallas de la tienda en celular: inicio, ofertas con filtros por categoría y detalle de un producto (datos de demostración)."),
+          skyShot("producto", "Detalle de producto con precio en promoción, selector de tonos con la disponibilidad de cada variante y botones para agregar a la bolsa o guardar en favoritos (datos de demostración)."),
+          skyShot("whatsapp", "Confirmación de un pedido registrado, con su código y su resumen, que invita a enviarlo por WhatsApp para continuar (datos de demostración)."),
+          skyShot("seguimiento", "Página privada de seguimiento de un pedido con sus etapas (registrado, confirmado, preparando, despachado y entregado) y el estado del pago y del envío (datos de demostración)."),
+          skyShot("resumen", "Resumen del panel administrativo con pedidos por confirmar, pagos por verificar, avisos por enviar, stock bajo y ventas de los últimos 30 días (datos de demostración)."),
+          skyShot("pedido", "Detalle de un pedido en el panel con sus productos, estados, historial, datos de entrega, enlace de seguimiento y totales (datos de demostración)."),
+          skyShot("promociones", "Módulo de promociones con descuentos porcentuales y de valor fijo, su destino, fechas de vigencia, estado e historial de versiones (datos de demostración)."),
+          skyShot("inventario", "Inventario con las existencias de cada variante, su SKU y su umbral de stock bajo, junto al formulario para registrar movimientos (datos de demostración)."),
+          skyShot("reportes", "Reportes de ventas por período con total vendido, pedidos y ticket promedio, pestañas de más vendidos y márgenes, y exportación a CSV (datos de demostración)."),
+        ],
       },
     ] as Project[],
   },
@@ -229,6 +298,17 @@ const es = {
           ["docs/", "Manual de usuario, runbook de producción, despliegue"],
           [".github/", "CI: pruebas, validación de OpenAPI, lint y build"],
         ] },
+      { name: "Sky Beauty Maquillaje", type: "Proyecto para cliente", featured: true, url: SKY_LINKS.repo,
+        desc: "Código fuente de la tienda virtual y de su panel administrativo, con pruebas unitarias, de integración y E2E.",
+        stack: ["Next.js", "NestJS", "Prisma", "PostgreSQL"], extra: ["Jest", "Playwright"], slug: "sky-beauty",
+        tree: [
+          ["backend/", "API NestJS · Prisma: esquema, migraciones y datos iniciales"],
+          ["frontend/", "Next.js · tienda, panel y pruebas E2E (Playwright)"],
+          ["Context/", "Reglas de negocio, decisiones y plan por módulos"],
+          ["docs/", "Planes de QA"],
+          ["docker/", "PostgreSQL local"],
+          ["sky-beauty-video/", "Video de demostración"],
+        ] },
       { name: "Sistema de gestión para laboratorio clínico", type: "Proyecto académico", url: "https://github.com/CrixxCode/ProyectoLabClinico",
         desc: "Aplicación full-stack desarrollada como proyecto académico para gestionar procesos relacionados con pacientes, médicos, órdenes, exámenes, muestras y resultados.",
         stack: ["Node.js", "TypeScript", "Express", "Angular"] },
@@ -303,6 +383,7 @@ const en: typeof es = {
     problem: "Problem", features: "Key features", stack: "Stack", status: "Status", mock: "Interface mockup", showShot: "Show screenshot",
     context: "Context", myRole: "My role", work: "Technical work",
     origin: "Origin", participation: "My contribution", concepts: "Applied concepts", decision: "Technical decision", demo: "View Demo", github: "GitHub", newTab: "(opens in a new tab)",
+    video: "Demo video", watchVideo: "Watch Video", play: "Play Video", youtube: "Watch on YouTube",
     caseStudy: "View Case Study", caseStudyL: "Case study", allProjects: "All projects", nextProject: "Next project",
     items: [
       {
@@ -340,6 +421,51 @@ const en: typeof es = {
         stack: ["Django", "FastAPI", "React", "MySQL"],
         work: ["QA", "Functional Testing", "Refactoring", "Bug Fixing"],
         status: "In development",
+      },
+      {
+        slug: "sky-beauty", name: "Sky Beauty Maquillaje", tag: "E-commerce · Beauty Retail · Full-Stack",
+        desc: "Online makeup store with WhatsApp orders and no account needed, plus a panel to manage catalog, inventory, orders, payments and shipping.",
+        context: "Client project: Sky Beauty Maquillaje, a beauty store in Colombia. The requirements were defined together with the business owner.",
+        problem: "The business sold without a digital channel of its own. It needed to show its catalog in an organized way, take orders without forcing customers to create an account, and keep serving them over WhatsApp, its usual channel. It also needed to track stock per variant so it wouldn’t sell what it doesn’t have. The system separates the stages that tend to blur when selling over chat: order registered, confirmed, payment verified, shipped and delivered.",
+        participation: "Solo full-stack development. I gathered and documented the requirements with the client, and built the data model, the API, the store and the admin panel, the automated tests and the demo video.",
+        features: [
+          "Checkout without an account: the order is sent over WhatsApp in a message with the summary already written.",
+          "Per-variant inventory (shade, color, size). Stock is reserved when the order is created, and every movement is logged.",
+          "Promotion engine with percentage or fixed-amount discounts, per variant, product or category, with validity dates and a priority rule.",
+          "Admin panel with two roles, owner and staff, each with its own permissions.",
+          "Order management, payment verification (bank transfer, Nequi, Daviplata and cash on delivery) and shipping with carrier and tracking number.",
+          "Order tracking through a private link or with the order code and phone number.",
+          "Automatic cancellation: after 48 h if the order is still unconfirmed and after 24 h if the payment receipt doesn’t arrive. The stock is released.",
+          "Reports on sales, best-selling products and margins, with CSV export.",
+          "Favorites without an account, a deals page and testimonials.",
+          "Colombia’s official departments and municipalities (DANE). Cash on delivery is offered only in enabled municipalities.",
+        ],
+        highlights: ["Orders via WhatsApp", "Per-variant inventory", "Promotion engine", "Admin panel with roles and permissions"],
+        stack: ["Next.js", "NestJS", "PostgreSQL", "Prisma"],
+        stackGroups: [
+          ["Frontend", ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS 4", "shadcn/ui", "TanStack Query", "Zustand", "React Hook Form + Zod"]],
+          ["Backend", ["NestJS 11", "Prisma 7", "PostgreSQL", "JWT + argon2", "sharp", "Swagger", "Pino"]],
+          ["Testing", ["Jest (unit and integration)", "Playwright (E2E on mobile and desktop)"]],
+          ["Infrastructure", ["Docker", "Railway (planned deployment)"]],
+        ],
+        concepts: ["REST API", "RBAC", "Revocable JWT sessions", "Transactions and concurrency control (atomic stock updates, rejecting concurrent edits)", "Idempotency", "Order state machine", "Order data stored as it was at purchase time", "Price and promotion history to compute the price on a given date", "HMAC tokens", "Rate limiting", "Scheduled jobs", "Unit, integration and E2E testing", "Mobile-first design"],
+        decision: { title: "Idempotent checkout with atomic stock reservation", text: "The order is created in a single transaction. Within it, the server recalculates prices and promotions, reserves stock for each variant and stores a copy of the commercial data at that moment. Every purchase attempt carries an idempotency key that the browser keeps. If the customer retries, or two requests arrive at once, the server returns the same order and doesn’t reserve stock twice. This prevents selling units that don’t exist and duplicate orders on unstable mobile connections." },
+        status: "Testing phase",
+        statusDetail: "13 of the 15 planned modules are done. The content and legal pages module is built but still needs the approved texts, and the Railway deployment is pending.",
+        links: SKY_LINKS, video: SKY_VIDEO, shareImage: SKY_SHARE,
+        cover: { ...SKY_COVER, alt: "Product detail in the Sky Beauty store with a discounted price, a shade selector showing each variant’s availability and an add-to-bag button (demo data)." },
+        shots: [
+          skyShot("inicio", "Sky Beauty store home page with the main banner, search bar, category menu and WhatsApp button (demo data)."),
+          skyShot("celular", "Three store screens on a phone: home, deals with category filters and a product detail page (demo data)."),
+          skyShot("producto", "Product detail with a discounted price, a shade selector showing each variant’s availability, and buttons to add to the bag or save to favorites (demo data)."),
+          skyShot("whatsapp", "Confirmation of a registered order, with its code and summary, prompting the customer to send it over WhatsApp to continue (demo data)."),
+          skyShot("seguimiento", "Private order tracking page with its stages (registered, confirmed, preparing, shipped and delivered) and the payment and shipping status (demo data)."),
+          skyShot("resumen", "Admin panel overview with orders to confirm, payments to verify, notices to send, low stock and sales over the last 30 days (demo data)."),
+          skyShot("pedido", "Order detail in the admin panel with its products, statuses, history, delivery details, tracking link and totals (demo data)."),
+          skyShot("promociones", "Promotions module with percentage and fixed-amount discounts, their target, validity dates, status and version history (demo data)."),
+          skyShot("inventario", "Inventory with each variant’s stock, SKU and low-stock threshold, next to the form for recording stock movements (demo data)."),
+          skyShot("reportes", "Sales reports by period with total sold, orders and average ticket, tabs for best sellers and margins, and CSV export (demo data)."),
+        ],
       },
     ] as Project[],
   },
@@ -426,6 +552,17 @@ const en: typeof es = {
           ["diagramas/", "Architecture, data model, booking lifecycle"],
           ["docs/", "User manual, production runbook, deployment"],
           [".github/", "CI: tests, OpenAPI validation, lint and build"],
+        ] },
+      { name: "Sky Beauty Maquillaje", type: "Client project", featured: true, url: SKY_LINKS.repo,
+        desc: "Source code for the online store and its admin panel, with unit, integration and E2E tests.",
+        stack: ["Next.js", "NestJS", "Prisma", "PostgreSQL"], extra: ["Jest", "Playwright"], slug: "sky-beauty",
+        tree: [
+          ["backend/", "NestJS API · Prisma schema, migrations and seed data"],
+          ["frontend/", "Next.js · store, admin panel and E2E tests (Playwright)"],
+          ["Context/", "Business rules, decisions and module plan"],
+          ["docs/", "QA plans"],
+          ["docker/", "Local PostgreSQL"],
+          ["sky-beauty-video/", "Demo video"],
         ] },
       { name: "Clinical laboratory management system", type: "Academic project", url: "https://github.com/CrixxCode/ProyectoLabClinico",
         desc: "Full-stack application developed as an academic project to manage workflows related to patients, physicians, orders, exams, samples and results.",

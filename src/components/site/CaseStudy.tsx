@@ -1,9 +1,42 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Play, ShieldCheck } from "lucide-react";
 import { Reveal, useSite } from "@/lib/site";
+import type { Dict } from "@/lib/i18n";
 import { ProjectLinks, ProjectVisual, Tag } from "./Sections";
 
 const label = "font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground";
+
+/** YouTube player behind a local poster: nothing loads from YouTube until play is pressed (privacy-enhanced domain). */
+function Video({ project }: { project: Dict["projects"]["items"][number] }) {
+  const p = useSite().t.projects;
+  const [playing, setPlaying] = useState(false);
+  if (!project.video) return null;
+  const { id, poster } = project.video;
+  return (
+    <>
+      <div className="relative aspect-video overflow-hidden rounded-xl border border-border-strong bg-card">
+        {playing ? (
+          <iframe src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`} title={`${p.video}: ${project.name}`}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="absolute inset-0 h-full w-full" />
+        ) : (
+          <button type="button" onClick={() => setPlaying(true)} data-umami-event="video-play" data-umami-event-project={project.slug}
+            className="group absolute inset-0">
+            <img src={poster} alt="" width={1280} height={720} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+            {/* In a corner, so it doesn't cover the poster's centered title */}
+            <span className="absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-soft transition-transform group-hover:scale-[1.03] group-active:scale-[0.97] md:bottom-6 md:left-6">
+              <Play className="h-4 w-4 fill-current" aria-hidden="true" />{p.play}<span className="sr-only">: {project.name}</span>
+            </span>
+          </button>
+        )}
+      </div>
+      <a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener noreferrer"
+        className="group mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+        {p.youtube}<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /><span className="sr-only">{p.newTab}</span>
+      </a>
+    </>
+  );
+}
 
 /** Full case study of one project (/proyectos/<slug>): everything the home page summary leaves out. */
 export function CaseStudy({ slug }: { slug: string }) {
@@ -14,13 +47,21 @@ export function CaseStudy({ slug }: { slug: string }) {
   const next = p.items[(index + 1) % p.items.length];
   const story = ([[p.origin, it.origin], [p.context, it.context], [p.problem, it.problem], [p.participation, it.participation]] as const)
     .filter((entry): entry is readonly [string, string] => Boolean(entry[1]));
-  // Fact sheet: role and status as text; stack as tags; concepts and kinds of work as plain text (ideas, not tools)
+  // Fact sheet: role and status as text; stack as tags (or by area, as text, when the project lists it in full);
+  // concepts and kinds of work as plain text (ideas, not tools)
   const facts = [
     it.roleTitle && { k: p.myRole, v: it.roleTitle },
-    { k: p.stack, v: <div className="flex flex-wrap gap-1.5">{it.stack.map((s) => <Tag key={s}>{s}</Tag>)}</div> },
+    { k: p.stack, v: it.stackGroups
+      ? <div className="space-y-3">{it.stackGroups.map(([area, items]) => (
+          <div key={area}><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{area}</p><p className="mt-1">{items.join(" · ")}</p></div>
+        ))}</div>
+      : <div className="flex flex-wrap gap-1.5">{it.stack.map((s) => <Tag key={s}>{s}</Tag>)}</div> },
     it.concepts && { k: p.concepts, v: <span className="text-muted-foreground">{it.concepts.join(" · ")}</span> },
     it.work && { k: p.work, v: <span className="text-muted-foreground">{it.work.join(" · ")}</span> },
-    { k: p.status, v: <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{it.status}</span> },
+    { k: p.status, v: <>
+      <span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />{it.status}</span>
+      {it.statusDetail && <p className="mt-2 text-muted-foreground">{it.statusDetail}</p>}
+    </> },
   ].filter((f) => !!f);
 
   return (
@@ -43,6 +84,15 @@ export function CaseStudy({ slug }: { slug: string }) {
       <section className="container-x">
         <Reveal focus><ProjectVisual project={it} index={index} gallery /></Reveal>
       </section>
+
+      {it.video && (
+        <section id="video" className="container-x pt-20 md:pt-28">
+          <Reveal>
+            <h2 className={label}>{p.video}</h2>
+            <div className="mt-5"><Video project={it} /></div>
+          </Reveal>
+        </section>
+      )}
 
       <section className="container-x grid gap-14 py-20 md:py-28 lg:grid-cols-12">
         <aside className="lg:col-span-4">

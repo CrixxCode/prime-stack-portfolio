@@ -24,9 +24,10 @@ PROFILE CONTENT
 - Do not invent years of experience, certificates, repository counts, contribution counts, or other stats not given.
 
 PROJECTS
-Two featured projects:
+Three featured projects:
 1) Wayra Travel — multitenant SaaS for lodging operations (SaaS · Hospitality Tech · Full-Stack). Started as an academic project and later evolved into a SaaS product; built by a two-developer team. Stack: Django, Angular, PostgreSQL, Docker. Status: testing phase. Demo: https://wayra-travel.com/ · Repo: https://github.com/CrixxCode/wayra-gh
 2) Ejercitador Saber Pro — institutional platform of the Vicerrectoría de Docencia, Universidad de La Guajira, for Saber Pro competencies. Joined an existing project (QA, testing, bug fixing, refactoring). Stack: Django, FastAPI, React, MySQL. Status: in development. Private repository: no link.
+3) Sky Beauty Maquillaje — online makeup store for Colombia with an admin panel (E-commerce · Beauty Retail · Full-Stack). Client project, built solo; checkout without an account, orders continue over WhatsApp. Stack: Next.js, NestJS, PostgreSQL, Prisma. Status: testing phase, not deployed yet (no demo link). Repo: https://github.com/CrixxCode/sky-beauty-web · Demo video: https://www.youtube.com/watch?v=a73Mkd9Z-II
 Do not expose any private company repository or client details.
 
 VISUAL SYSTEM

@@ -15,7 +15,7 @@ export const CV_FILES = { es: "Cristian_Ramirez_CV_ES.pdf", en: "Cristian_Ramire
 
 const CV_EXTRA = {
   es: {
-    headings: { profile: "Perfil", experience: "Experiencia", projects: "Proyecto destacado", education: "Formación", achievements: "Logros", stack: "Stack", concepts: "Conceptos", courses: "Cursos", languages: "Idiomas" },
+    headings: { profile: "Perfil", experience: "Experiencia", projects: "Proyectos destacados", education: "Formación", achievements: "Logros", stack: "Stack", concepts: "Conceptos", courses: "Cursos", languages: "Idiomas" },
     profile: "Full-Stack Developer enfocado en construir productos web de principio a fin: requisitos, arquitectura, datos, backend, frontend y experiencia de usuario. Mi stack principal es Django + Angular, con uso profesional de ASP.NET Core/.NET y React, y fundamentos que me permiten adaptarme a distintas tecnologías.",
     // Bullets per job, matched to the site's jobs by organization
     jobs: {
@@ -31,8 +31,13 @@ const CV_EXTRA = {
         "Refactorización de componentes de la arquitectura existente.",
       ] },
     },
-    projectRole: "Desarrollo conjunto en un equipo de dos: requisitos, arquitectura, modelado de datos, backend, frontend, autenticación y autorización (RBAC), multitenancy, pruebas, documentación y despliegue.",
-    more: "Más proyectos en",
+    // The site's projects shown in the CV (by slug, in this order): what it is and my role, in about two lines,
+    // shorter than the site's description so the CV stays on one page
+    projects: {
+      "wayra-travel": "SaaS multitenant de gestión hotelera, en equipo de dos: requisitos, arquitectura, datos, backend, frontend, RBAC, multitenancy, pruebas y despliegue.",
+      "sky-beauty": "Tienda virtual con compra sin cuenta, pedidos por WhatsApp y panel administrativo. Desarrollo individual para cliente: requisitos, datos, API, frontend y pruebas automatizadas.",
+    },
+    video: "Video",
     saber: "Saber Pro: puntaje global 188 · Inglés 181",
     education: ["Décimo semestre · Graduación estimada: primer semestre de 2027", "Finalizado"],
     courses: [
@@ -44,7 +49,7 @@ const CV_EXTRA = {
     languages: [["Español", "Nativo"], ["Inglés", "B2 · Saber Pro"]],
   },
   en: {
-    headings: { profile: "Profile", experience: "Experience", projects: "Featured project", education: "Education", achievements: "Achievements", stack: "Stack", concepts: "Concepts", courses: "Courses", languages: "Languages" },
+    headings: { profile: "Profile", experience: "Experience", projects: "Featured projects", education: "Education", achievements: "Achievements", stack: "Stack", concepts: "Concepts", courses: "Courses", languages: "Languages" },
     profile: "Full-Stack Developer focused on building web products end to end: requirements, architecture, data, backend, frontend and user experience. My primary stack is Django + Angular, with professional use of ASP.NET Core/.NET and React, and fundamentals that let me adapt to different technologies.",
     // Bullets per job, matched to the site's jobs by organization
     jobs: {
@@ -60,8 +65,11 @@ const CV_EXTRA = {
         "Refactoring components of the existing architecture.",
       ] },
     },
-    projectRole: "Built jointly in a two-developer team: requirements, architecture, data modeling, backend, frontend, authentication and authorization (RBAC), multitenancy, testing, documentation and deployment.",
-    more: "More projects at",
+    projects: {
+      "wayra-travel": "Multitenant hotel management SaaS, built in a two-developer team: requirements, architecture, data, backend, frontend, RBAC, multitenancy, testing and deployment.",
+      "sky-beauty": "Online store with checkout without an account, orders over WhatsApp and an admin panel, built solo for a client: requirements, data, API, frontend and automated tests.",
+    },
+    video: "Video",
     saber: "Saber Pro: overall score 188 · English 181",
     education: ["Tenth semester · Expected graduation: first half of 2027", "Completed"],
     courses: [
@@ -83,7 +91,6 @@ function render(lang) {
     const s = new Intl.DateTimeFormat(lang, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
-  const wayra = t.projects.items[0];
   const [eng, tech] = t.education.programs;
   const section = (title, body) => `<section><h2>${esc(title)}</h2>${body}</section>`;
   const entry = ({ title, org, meta, period, body }) => `
@@ -102,14 +109,23 @@ function render(lang) {
     body: list(extra?.bullets ?? []),
   }); }).join("") + (eng.role ? entry({ title: esc(eng.role.t), org: esc(eng.school), period: eng.role.period, body: `<p>${esc(eng.role.d)}</p>` }) : "");
 
-  const project = entry({
-    title: `${esc(wayra.name)} <span class="tag">${esc(wayra.status)}</span>`,
-    org: "",
-    period: "",
-    body: `<p>${esc(wayra.desc)} ${esc(x.projectRole)}</p>
-      <p class="tech">${wayra.stack.map(esc).join(" · ")}</p>
-      <p class="links"><a href="${wayra.links.demo}">${bare(wayra.links.demo)}</a> · <a href="${wayra.links.repo}">${bare(wayra.links.repo)}</a> · ${esc(x.more)} <a href="${CONTACT.github}">${bare(CONTACT.github)}</a></p>`,
-  });
+  // Stack and links (as bare URLs) share one line to keep the CV on a single page
+  const projects = Object.keys(x.projects).map((slug) => {
+    const p = t.projects.items.find((it) => it.slug === slug);
+    const video = p.video && `https://youtu.be/${p.video.id}`;
+    const links = [
+      p.links.demo && `<a href="${p.links.demo}">${bare(p.links.demo)}</a>`,
+      `<a href="${p.links.repo}">${bare(p.links.repo)}</a>`,
+      video && `${esc(x.video)}: <a href="${video}">${bare(video)}</a>`,
+    ].filter(Boolean);
+    return entry({
+      title: `${esc(p.name)} <span class="tag">${esc(p.status)}</span>`,
+      org: "",
+      period: "",
+      body: `<p>${esc(x.projects[slug])}</p>
+        <p class="project-meta"><span class="tech">${p.stack.map(esc).join(" · ")}</span><span class="links">${links.join(" · ")}</span></p>`,
+    });
+  }).join("");
 
   const education = [eng, tech].map((p, i) => entry({
     title: esc(p.degree), org: esc(p.school), meta: esc(x.education[i]), period: p.period, body: "",
@@ -135,18 +151,19 @@ function render(lang) {
   html, body { width: 8.5in; height: 11in; }
   body { font: 9.2pt/1.4 "Geist", system-ui, sans-serif; color: var(--fg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .page { display: grid; grid-template-columns: 1fr 2.25in; height: 11in; }
-  main { padding: 0.42in 0.32in 0.3in 0.55in; }
+  main { padding: 0.38in 0.32in 0.2in 0.55in; }
   aside { background: var(--surface); border-left: 1px solid var(--border); padding: 0.42in 0.4in 0.3in 0.3in; }
-  header { border-bottom: 2px solid var(--primary); padding-bottom: 9pt; margin-bottom: 10pt; }
+  header { border-bottom: 2px solid var(--primary); padding-bottom: 9pt; margin-bottom: 8pt; }
   h1 { font-size: 24pt; font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
   .role { font-family: "Geist Mono", monospace; font-size: 9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); margin-top: 5pt; }
   .contact { margin-top: 7pt; font-size: 8.6pt; color: var(--muted); }
   .contact a { color: var(--fg); white-space: nowrap; }
   .contact.remote { margin-top: 2pt; }
   a { color: var(--primary); text-decoration: none; }
-  section { margin-bottom: 9pt; }
-  h2 { font-family: "Geist Mono", monospace; font-size: 8pt; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 3pt; margin-bottom: 6pt; }
-  .entry { margin-bottom: 6pt; break-inside: avoid; }
+  section { margin-bottom: 7pt; }
+  main section:last-child, main section:last-child .entry:last-child { margin-bottom: 0; }
+  h2 { font-family: "Geist Mono", monospace; font-size: 8pt; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 3pt; margin-bottom: 5pt; }
+  .entry { margin-bottom: 5pt; break-inside: avoid; }
   .entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8pt; }
   h3 { font-size: 10.2pt; font-weight: 600; }
   .period { font-family: "Geist Mono", monospace; font-size: 7.8pt; color: var(--muted); white-space: nowrap; }
@@ -159,6 +176,7 @@ function render(lang) {
   .entry p { margin-top: 3pt; }
   .tech { font-family: "Geist Mono", monospace; font-size: 8pt; color: var(--muted); }
   .links { font-size: 8.4pt; color: var(--muted); }
+  .entry .project-meta { margin-top: 2pt; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12pt; }
   aside section { margin-bottom: 11pt; }
   .group { margin-bottom: 6pt; }
   h4 { font-size: 8.4pt; font-weight: 600; }
@@ -178,7 +196,7 @@ function render(lang) {
     </header>
     ${section(h.profile, `<p>${esc(x.profile)}</p>`)}
     ${section(h.experience, jobs)}
-    ${section(h.projects, project)}
+    ${section(h.projects, projects)}
     ${section(h.education, education)}
   </main>
   <aside>

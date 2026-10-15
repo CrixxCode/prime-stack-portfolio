@@ -63,8 +63,8 @@ function Avatar() {
   const DB = 6;
   const edges = [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [3, 5], [4, 6], [5, 6], [2, 5]] as const;
   return (
-    <div ref={ref} onPointerEnter={dash.speedUp} onPointerMove={onMove} onPointerLeave={onLeave} className="relative aspect-[4/5] w-full max-w-md" aria-hidden="true">
-      <div className="absolute inset-0 rounded-2xl border border-border bg-surface bg-grid [mask-image:radial-gradient(closest-side,black,transparent)]" />
+    <div ref={ref} onPointerEnter={dash.speedUp} onPointerMove={onMove} onPointerLeave={onLeave} className="relative aspect-4/5 w-full max-w-md" aria-hidden="true">
+      <div className="absolute inset-0 rounded-2xl border border-border bg-surface bg-grid mask-[radial-gradient(closest-side,black,transparent)]" />
       <svg ref={svgRef} viewBox="0 0 400 500" className="absolute inset-0 h-full w-full" style={layer(10)}>
         {/* head silhouette made of geometry */}
         <circle cx="200" cy="170" r="92" fill="none" stroke="var(--border-strong)" />
