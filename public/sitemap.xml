@@ -20,4 +20,10 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://cristianramirez.up.railway.app/proyectos/ejercitador-saber-pro?lang=en"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cristianramirez.up.railway.app/proyectos/ejercitador-saber-pro"/>
   </url>
+  <url>
+    <loc>https://cristianramirez.up.railway.app/proyectos/sky-beauty</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://cristianramirez.up.railway.app/proyectos/sky-beauty?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cristianramirez.up.railway.app/proyectos/sky-beauty?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cristianramirez.up.railway.app/proyectos/sky-beauty"/>
+  </url>
 </urlset>
